@@ -260,3 +260,14 @@ Attacker tricks user to browse attack.com
 Browser sends request to bank.com when rendering the page served by attcker.com, such as \<img src="https://bank.com/...">
 
 Browser is called the ***confused deputy***
+
+<img src="11.JPG" width="50%" height="50%">
+
+#### Defending against CSRF
+
+1. Browser sends the referrer header, server decides whether to honor the request  or not
+   1. Header is not reliable
+   2. CORS policy
+2. Browser don't sent cookies
+   1. samesite cookies
+
