@@ -158,7 +158,7 @@ Browser support for CORS
 
 <img src="2.JPG" width="50%" height="50%">
 
-### Server-side set ip
+### Server-side set up
 
 1. Apache
 
@@ -181,3 +181,9 @@ Injected code are considered to have the origin of victim page
 Cross origin writes are allowed
 
 <img src="3.JPG" width="50%" height="50%">
+
+## CSP (Content Security Policy)
+
+Instead of HTTP response header, CSP can be included on a page directly
+
+\<>
