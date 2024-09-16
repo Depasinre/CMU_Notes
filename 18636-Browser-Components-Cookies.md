@@ -218,3 +218,126 @@ User can modify cookies
 
 <img src="4.jpg" width="50%" height="50%">
 
+## Attacks Around Cookies
+
+### 1. Cookie Theft (Attack on Secrecy)
+
+- Cookies are used to maintain session state (e.g., for authenticated users).
+- If stolen, an attacker can impersonate the user, leading to **session hijacking**.
+
+####  Defenses Against Cookie Theft:
+
+- **Set the HttpOnly Flag**:
+  - Prevents JavaScript from accessing cookies, limiting the impact of XSS (cross-site scripting).
+  - **Limitations**: Cookies can still be seen in HTTP request/response headers.
+  - Note: JavaScript access to headers was once a bug but has been fixed in most browsers.
+- **Set the Secure Flag**:
+  - Ensures cookies are only sent over secure (HTTPS) connections, reducing the risk of **packet sniffing** by network attackers.
+  - **Old Attacks**: Previously, attackers could set secure cookies over an HTTP connection, but this has been patched in modern browsers.
+
+### 2. Cookie Poisoning (Attack on Integrity)
+
+#### Attackers can modify cookie values.
+  - Example: If a cookie stores the value of a shopping cart, an attacker might modify the value (e.g., from `shopping-cart-total=150` to `shopping-cart-total=15`), exploiting weaknesses in early 2000s shopping sites.
+
+##### Defenses Against Cookie Poisoning:
+
+- Add Cryptographic Checksums:
+  - Use a server-side key to generate a hash (e.g., HMAC) for cookie values.
+  - The server validates the cookie by comparing the checksum when the cookie is sent back.
+  
+  <img src="5.jpg" width="50%" height="50%">
+
+#### Cookie Expiration Manipulation
+
+- Never Expired Cookie::
+  - If the cookie's expiration is not set, the browser should delete it when the tab closes.
+  - **Issue**: The "restart/restore" feature of browsers (e.g., Chrome, Firefox) can keep cookies alive indefinitely, which is a potential risk, especially on public computers.
+
+##### Lesson Learned:
+
+- Do not rely solely on the browser to expire cookies. Use explicit expiration dates.
+
+### 3. Cookie Injection
+
+#### Session Fixation Attack:
+An attacker tricks a user into using a pre-set session token.
+The attacker injects this token into the user's browser, and when the user logs in, the attacker hijacks the session using the same token.
+
+##### Defense:
+When elevating a user from anonymous to logged-in, always issue a **new session token** that the attacker cannot predict or reuse.
+Once user logs in, token changes to value unknown to attacker.  -->Attacker’s token is not elevated.
+
+#### Cookie Injection with the Secure Flag:
+If a cookie is set with the secure flag, it should only be transmitted over HTTPS.
+Previously, insecure HTTP connections could overwrite secure cookies, but modern browsers prevent this.
+
+##### New Browser Feature:
+  - Secure cookies can only be set via HTTPS with the secure flag enabled (since Chrome 52, Firefox 52, and higher).
+- **HTTP Strict Transport Security (HSTS)**:
+  - The HSTS header forces browsers to only accept HTTPS connections and can apply this rule to all subdomains (using `includeSubDomains`).
+
+#### Shadow Cookies with Secure Flag (with HSTS)
+
+- Example: **Hijacking Gmail Chat Window**:
+
+  - A network attacker can set a malicious cookie for chat.google.com, causing the victim's chat window to be compromised.
+
+  <img src="6.jpg" width="50%" height="50%">
+
+  - **Defense**: Enforce HTTPS on all subdomains to prevent shadowing of secure cookies by insecure connections.
+
+####  Cookie Injection Leading to XSS
+- If cookies are reflected into HTML without proper validation, attackers can inject malicious code.
+
+- Example:
+
+```php
+if (isset($_COOKIE["language"])) {
+echo $_COOKIE["language"];
+} else {
+echo "<em>not set</em>";
+}
+```
+
+<img src="7.jpg" width="50%" height="50%">
+
+##### Defense: 
+
+- Always validate cookies before reflecting them into HTML to prevent XSS.
+- Assuming previously set cookies are the ones being sent is not always sound 
+  - Attacker may inject cookies in between
+- Secure cookies can only be set by HTTPS connection with secure flag on
+  - Chrome 52 and higher and Firefox 52 and higher 
+> Reasoning about the logic of web applications is not quite enough, need to know what browser is doing also
+
+## CSRF Revisited and the SameSite Attribute
+
+- **CSRF (Cross-Site Request Forgery)** occurs when cookies are sent to `bank.com` while browsing `attacker.com`.
+- The `SameSite` attribute helps prevent this by restricting cookies to first-party or same-site contexts.
+
+<img src="8.jpg" width="50%" height="50%">
+
+**Browser Defaults**:
+
+- If `SameSite` is not set, most modern browsers (Chrome, Edge, Firefox, Brave) default it to **Lax**, which helps prevent CSRF attacks.
+
+## Cookie Prefixes for Added Security
+
+- **__Host- Prefix**:
+  - A cookie with this prefix is only accepted if:
+    - The Secure flag is set.
+    - It is sent from a secure origin.
+    - It has no Domain attribute (so it can only be set by the host, not subdomains).
+    - Its Path attribute is set to `/`.
+- **__Secure- Prefix**:
+  - A cookie with this prefix is only accepted if the Secure flag is set and it is sent from a secure origin.
+
+## Key Takeaways:
+
+- Cookies are essential for managing sessions, personalizing websites, and tracking users.
+- **Cookie Scoping Rules** can be problematic, especially with shared domain providers. Awareness of the **Public Suffix List** is important.
+- **Cookie Attacks** include theft, poisoning, and injection, allowing attackers to impersonate users or gain access to resources.
+- Browser Defenses::
+  - Use HttpOnly and Secure flags, full HSTS (with subdomains), and cookie prefixes to enhance security.
+
