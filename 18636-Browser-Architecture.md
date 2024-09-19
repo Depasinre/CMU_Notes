@@ -8,7 +8,7 @@ tags:
 - CMU
 ---
 
-This Notes contains: 
+This Note contains: 
 
 - Security problems and mitigation strategies
 - 

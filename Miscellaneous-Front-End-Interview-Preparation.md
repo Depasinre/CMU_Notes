@@ -6,7 +6,7 @@ tags:
 - Interview Preparation
 ---
 
-This Notes contains: 
+This Note contains: 
 
 - JavaScript 数据类型
 - 浏览器进程
