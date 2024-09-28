@@ -560,9 +560,7 @@ var longestOnes = function(nums, k) {
 
    - 一直重复上述步骤，直到 `right` 到达数组的末尾。此时，已经找到了能够满足条件的最长子数组。
 
-   
-
-> ### 1. **为什么先移动再检查？**
+> 1. **为什么先移动再检查？**
 >
 > 在滑动窗口的算法中，先移动指针（右边界 `right`）再检查 `0` 的数量是否合规，是一种**贪心策略**。这个策略有几个优势：
 >
@@ -570,7 +568,7 @@ var longestOnes = function(nums, k) {
 > - **动态调整**：在窗口扩展的过程中，你随时可以通过缩小窗口来调整，使其重新符合条件。这个策略确保每一步都在一个有效的范围内操作，而不必预先计算或预测未来的情况，这减少了复杂性。
 > - **时间复杂度的优化**：预先检查可能需要额外的计算和判断，使得算法复杂度更高，甚至可能导致一些不必要的计算。而“先移动再检查”的策略确保了每次移动是必要且有效的，避免了重复和冗余的操作。
 >
-> ### 2. **为什么不选择预测下一步是否合规？**
+> 2. **为什么不选择预测下一步是否合规？**
 >
 > 虽然从逻辑上看，先预测下一步是否合规再决定是否移动可能显得更加“严谨”，但在实际操作中，这种方法往往会带来复杂的边界情况处理和多余的计算。
 >
@@ -578,8 +576,298 @@ var longestOnes = function(nums, k) {
 > - **操作冗余**：预先预测需要你在每次移动之前都进行一次完整的检查，可能会涉及到重复计算。而这些计算在实际移动后可能并不需要进行，从而浪费了资源。
 > - **灵活性下降**：如果先预测再移动，你需要提前定义好所有可能的操作路径，这种方式在处理一些复杂或特殊情况下可能表现得不如先移动再调整的方法灵活。例如，当窗口中突然出现连续多个 `0` 时，先预测再移动的策略可能需要复杂的判断逻辑来确定如何操作，而先移动再调整的方法则可以自然而然地处理这些情况。
 >
-> ### 3. **为什么“先移动再检查”的策略足够好？**
+> 3. **为什么“先移动再检查”的策略足够好？**
 >
 > 先移动再检查实际上是一种**懒惰计算**的方式，即仅在需要时才做出调整，而不是提前计算。懒惰计算的好处是它避免了不必要的操作，保持了算法的简单和高效。即使在极端情况下（比如窗口内突然多了很多 `0`），你仍然可以通过调整左边界来保证窗口的合法性。
 >
 > 这种策略可以被视为一种“宽容”的方式，即允许窗口扩展，即使它可能会暂时超出限制，然后通过后续的调整来恢复窗口的合法性。这种方式不仅易于实现，还能保证在最坏情况下的效率。
+
+
+
+## 8. Given the `head` of a singly linked list, return *the middle node of the linked list*.
+
+If there are two middle nodes, return **the second middle** node.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/07/23/lc-midlist1.jpg)
+
+```
+Input: head = [1,2,3,4,5]
+Output: [3,4,5]
+Explanation: The middle node of the list is node 3.
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/07/23/lc-midlist2.jpg)
+
+```
+Input: head = [1,2,3,4,5,6]
+Output: [4,5,6]
+Explanation: Since the list has two middle nodes with values 3 and 4, we return the second one.
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the list is in the range `[1, 100]`.
+- `1 <= Node.val <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var middleNode = function(head) {    
+    let slow = head;
+    let fast = head;
+    
+    while (fast && fast.next){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    
+    return slow;
+    
+};
+```
+
+## 9.  Remove Duplicates from Sorted List
+
+Given the `head` of a sorted linked list, *delete all duplicates such that each element appears only once*. Return *the linked list **sorted** as well*.
+
+
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/04/list1.jpg)
+
+```
+Input: head = [1,1,2]
+Output: [1,2]
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/04/list2.jpg)
+
+```
+Input: head = [1,1,2,3,3]
+Output: [1,2,3]
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the list is in the range `[0, 300]`.
+- `-100 <= Node.val <= 100`
+- The list is guaranteed to be **sorted** in ascending order.
+
+### My Solution
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var deleteDuplicates = function(head) {
+    let front = head ? head.next : head;
+    let back = head;
+    
+    while(front && front.next){
+        if(front.val===back.val){
+            front = front.next;
+            back.next = front;
+        } else {
+            front = front.next;
+            back = back.next;
+        }
+    }
+    
+    if(front){
+        if(front.val===back.val){
+            back.next = null;
+        }
+    }
+    
+    return head
+    
+    
+}
+```
+
+## 10. Running Sum of 1d Array
+
+Given an array `nums`. We define a running sum of an array as `runningSum[i] = sum(nums[0]…nums[i])`.
+
+Return the running sum of `nums`.
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3,4]
+Output: [1,3,6,10]
+Explanation: Running sum is obtained as follows: [1, 1+2, 1+2+3, 1+2+3+4].
+```
+
+**Example 2:**
+
+```
+Input: nums = [1,1,1,1,1]
+Output: [1,2,3,4,5]
+Explanation: Running sum is obtained as follows: [1, 1+1, 1+1+1, 1+1+1+1, 1+1+1+1+1].
+```
+
+**Example 3:**
+
+```
+Input: nums = [3,1,2,10,1]
+Output: [3,4,6,16,17]
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= nums.length <= 1000`
+- `-10^6 <= nums[i] <= 10^6`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var runningSum = function(nums) {
+    let sum = 0;
+    let result = [];
+    
+    nums.forEach((value) => {
+        sum += value;
+        result.push(sum);
+    })
+    
+    return result;
+};
+```
+
+## 11. Minimum Value to Get Positive Step by Step Sum
+
+Given an array of integers `nums`, you start with an initial **positive** value *startValue**.*
+
+In each iteration, you calculate the step by step sum of *startValue* plus elements in `nums` (from left to right).
+
+Return the minimum **positive** value of *startValue* such that the step by step sum is never less than 1.
+
+**Example 1:**
+
+```
+Input: nums = [-3,2,-3,4,2]
+Output: 5
+Explanation: If you choose startValue = 4, in the third iteration your step by step sum is less than 1.
+step by step sum
+startValue = 4 | startValue = 5 | nums
+  (4 -3 ) = 1  | (5 -3 ) = 2    |  -3
+  (1 +2 ) = 3  | (2 +2 ) = 4    |   2
+  (3 -3 ) = 0  | (4 -3 ) = 1    |  -3
+  (0 +4 ) = 4  | (1 +4 ) = 5    |   4
+  (4 +2 ) = 6  | (5 +2 ) = 7    |   2
+```
+
+**Example 2:**
+
+```
+Input: nums = [1,2]
+Output: 1
+Explanation: Minimum start value should be positive. 
+```
+
+**Example 3:**
+
+```
+Input: nums = [1,-2,-3]
+Output: 5
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 100`
+- `-100 <= nums[i] <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var minStartValue = function(nums) {
+    let sum = 0;
+    let min_sum = 0;
+    
+    nums.forEach((value) => {
+        sum += value;
+        if(sum < min_sum){
+            min_sum = sum;
+        }
+    })
+    
+    return 1 - min_sum;
+};
+```
+
+### MySolution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number[]}
+ */
+var getAverages = function(nums, k) {
+    let sum = 0;
+    let sums = [];
+    let result = [];
+    
+    nums.forEach((value) => {
+        sum += value;
+        sums.push(sum);
+    })
+    nums.forEach((value, index, array) => {
+        if (index < k || (index + k) > (array.length -1)){
+            result.push(-1);
+        } else {
+            let count = 2 * k + 1;
+            let sumSubArr = sums[index + k] - ((index - k - 1) < 0 ? 0 : sums[index - k - 1]);
+            result.push(Math.trunc(sumSubArr / count));
+        }
+    })
+    
+    return result;
+};
+```
+
+
+
