@@ -1138,3 +1138,74 @@ Output: 2
 - `1 <= nums.length <= 2 * 104`
 - `-1000 <= nums[i] <= 1000`
 - `-107 <= k <= 107`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var subarraySum = function(nums, k) {
+    let sums = [];
+    let temp = 0;
+    let result = 0;
+    nums.forEach((value) => {
+        temp += value;
+        sums.push(temp);
+    });
+
+    for (let right = 0; right < nums.length; right++){
+        for (let left = 0; left <= right; left ++){
+            let subSum = sums[right] - (left<1 ? 0 : sums[left - 1])
+
+            if (subSum === k) {
+                result ++;
+                }
+        }
+    }
+
+    return result;
+};
+```
+
+This solution is efficiency on memory/space, but inefficiency on time.
+
+### Time Efficiency Solution
+
+```javascript
+var subarraySum = function(nums, k) {
+    let prefixSumMap = new Map();
+    prefixSumMap.set(0, 1);  // 前缀和为0的情况，初始化
+    let currentSum = 0;  // 当前前缀和
+    let result = 0;  // 记录符合条件的子数组数量
+
+    // 遍历数组
+    for (let i = 0; i < nums.length; i++) {
+        currentSum += nums[i];  // 更新当前前缀和
+
+        // 检查是否存在 currentSum - k
+        if (prefixSumMap.has(currentSum - k)) {
+            result += prefixSumMap.get(currentSum - k);  // 累加符合条件的子数组数量
+        }
+
+        // 更新当前前缀和在哈希映射中的次数
+        prefixSumMap.set(currentSum, (prefixSumMap.get(currentSum) || 0) + 1);
+    }
+
+    return result;  // 返回结果
+};
+```
+
+我们使用前缀和的主要目的是将**子数组和问题转化为前缀和的差问题**。前缀和的定义是：从数组开头到当前位置的元素的和。在数组中找到一个子数组的和等于 `k`，相当于找到两个前缀和的差值等于 `k`。
+
+公式上：
+
+- 如果 `prefixSum[right] - prefixSum[left - 1] = k`，那么 `nums[left...right]` 这个子数组的和就是 `k`。
+- 通过变换公式，我们有 `prefixSum[left - 1] = prefixSum[right] - k`。
+
+因此，算法的核心是：
+
+1. 遍历数组，累加当前的前缀和 `currentSum`。
+2. 检查是否存在一个前缀和等于 `currentSum - k`。如果存在，说明我们找到了一个子数组的和等于 `k`。
