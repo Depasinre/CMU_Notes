@@ -411,8 +411,6 @@ var missingNumber = function(nums) {
 
 Given an integer array `arr`, count how many elements `x` there are, such that `x + 1` is also in `arr`. If there are duplicates in `arr`, count them separately.
 
- 
-
 **Example 1:**
 
 ```
@@ -584,7 +582,7 @@ var longestOnes = function(nums, k) {
 
 
 
-## 8. Given the `head` of a singly linked list, return *the middle node of the linked list*.
+## 8. Middle Node Of The Linked List
 
 If there are two middle nodes, return **the second middle** node.
 
@@ -775,7 +773,7 @@ var runningSum = function(nums) {
 
 ## 11. Minimum Value to Get Positive Step by Step Sum
 
-Given an array of integers `nums`, you start with an initial **positive** value *startValue**.*
+Given an array of integers `nums`, you start with an initial **positive** value *startValue.*
 
 In each iteration, you calculate the step by step sum of *startValue* plus elements in `nums` (from left to right).
 
@@ -838,7 +836,64 @@ var minStartValue = function(nums) {
 };
 ```
 
-### MySolution
+## 12. K Radius Subarray Averages
+
+You are given a **0-indexed** array `nums` of `n` integers, and an integer `k`.
+
+The **k-radius average** for a subarray of `nums` **centered** at some index `i` with the **radius** `k` is the average of **all** elements in `nums` between the indices `i - k` and `i + k` (**inclusive**). If there are less than `k` elements before **or** after the index `i`, then the **k-radius average** is `-1`.
+
+Build and return *an array* `avgs` *of length* `n` *where* `avgs[i]` *is the **k-radius average** for the subarray centered at index* `i`.
+
+The **average** of `x` elements is the sum of the `x` elements divided by `x`, using **integer division**. The integer division truncates toward zero, which means losing its fractional part.
+
+- For example, the average of four elements `2`, `3`, `1`, and `5` is `(2 + 3 + 1 + 5) / 4 = 11 / 4 = 2.75`, which truncates to `2`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/11/07/eg1.png)
+
+```
+Input: nums = [7,4,3,9,1,8,5,2,6], k = 3
+Output: [-1,-1,-1,5,4,4,-1,-1,-1]
+Explanation:
+- avg[0], avg[1], and avg[2] are -1 because there are less than k elements before each index.
+- The sum of the subarray centered at index 3 with radius 3 is: 7 + 4 + 3 + 9 + 1 + 8 + 5 = 37.
+  Using integer division, avg[3] = 37 / 7 = 5.
+- For the subarray centered at index 4, avg[4] = (4 + 3 + 9 + 1 + 8 + 5 + 2) / 7 = 4.
+- For the subarray centered at index 5, avg[5] = (3 + 9 + 1 + 8 + 5 + 2 + 6) / 7 = 4.
+- avg[6], avg[7], and avg[8] are -1 because there are less than k elements after each index.
+```
+
+**Example 2:**
+
+```
+Input: nums = [100000], k = 0
+Output: [100000]
+Explanation:
+- The sum of the subarray centered at index 0 with radius 0 is: 100000.
+  avg[0] = 100000 / 1 = 100000.
+```
+
+**Example 3:**
+
+```
+Input: nums = [8], k = 100000
+Output: [-1]
+Explanation: 
+- avg[0] is -1 because there are less than k elements before and after index 0.
+```
+
+**Constraints:**
+
+- `n == nums.length`
+- `1 <= n <= 105`
+- `0 <= nums[i], k <= 105`
+
+
+
+### My Solution
 
 ```javascript
 /**
@@ -869,5 +924,217 @@ var getAverages = function(nums, k) {
 };
 ```
 
+## 13. Subarray Product Less than K
+
+Given an array of integers `nums` and an integer `k`, return *the number of contiguous subarrays where the product of all the elements in the subarray is strictly less than* `k`.
+
+**Example 1:**
+
+```
+Input: nums = [10,5,2,6], k = 100
+Output: 8
+Explanation: The 8 subarrays that have product less than 100 are:
+[10], [5], [2], [6], [10, 5], [5, 2], [2, 6], [5, 2, 6]
+Note that [10, 5, 2] is not included as the product of 100 is not strictly less than k.
+```
+
+**Example 2:**
+
+```
+Input: nums = [1,2,3], k = 0
+Output: 0
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 3 * 104`
+- `1 <= nums[i] <= 1000`
+- `0 <= k <= 106`
+
+### My Solution
+
+```javascript
+ /**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var numSubarrayProductLessThanK = function(nums, k) {
+    let front = 0;
+    let back = 0;
+    let currentValue = 1;
+    let count = 0;
+    if (k <= 1){
+        return 0;
+    }
+    while (front < nums.length){
+        currentValue *= nums[front];
+        while(currentValue >= k){
+            currentValue = currentValue / nums[back];
+            back ++;
+        }
+
+        count += front - back + 1;
+        front ++;
+    }
 
 
+    return count;
+    
+};
+```
+
+> 关键点:  在这题条件中, 如果我们已经知道一个sub array满足 乘积小于k 的条件, 那么这个sub array的所有 sub array 也一定满足条件 ( 因为规定数组中的整数 >= 1)
+
+## 14. Intersection Of Multiple Arrays
+
+Given a 2D integer array `nums` where `nums[i]` is a non-empty array of **distinct** positive integers, return *the list of integers that are present in **each array** of* `nums` *sorted in **ascending order***.
+
+**Example 1:**
+
+```
+Input: nums = [[3,1,2,4,5],[1,2,3,4],[3,4,5,6]]
+Output: [3,4]
+Explanation: 
+The only integers present in each of nums[0] = [3,1,2,4,5], nums[1] = [1,2,3,4], and nums[2] = [3,4,5,6] are 3 and 4, so we return [3,4].
+```
+
+**Example 2:**
+
+```
+Input: nums = [[1,2,3],[4,5,6]]
+Output: []
+Explanation: 
+There does not exist any integer present both in nums[0] and nums[1], so we return an empty list [].
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= nums.length <= 1000`
+- `1 <= sum(nums[i].length) <= 1000`
+- `1 <= nums[i][j] <= 1000`
+- All the values of `nums[i]` are **unique**.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[][]} nums
+ * @return {number[]}
+ */
+var intersection = function(nums) {
+    let map = new Map();
+    let keys = [];
+
+    nums.forEach((value, index, array) => {
+            value.forEach((subValue) => {
+                if (map.has(subValue)){
+                    let currentValue = map.get(subValue);
+                    map.set(subValue, currentValue + 1);
+                }else {
+                    map.set(subValue, 1);
+                }
+            })
+    })
+    map.forEach((value, key) => {
+        if (value === nums.length) {
+            keys.push(key);
+        }
+    });
+
+    return keys.sort((a, b) => {return a - b});
+}
+```
+
+## 15. Check if All Characters Have Equal Number of Occurrences
+
+Given a string `s`, return `true` *if* `s` *is a **good** string, or* `false` *otherwise*.
+
+A string `s` is **good** if **all** the characters that appear in `s` have the **same** number of occurrences (i.e., the same frequency).
+
+**Example 1:**
+
+```
+Input: s = "abacbc"
+Output: true
+Explanation: The characters that appear in s are 'a', 'b', and 'c'. All characters occur 2 times in s.
+```
+
+**Example 2:**
+
+```
+Input: s = "aaabb"
+Output: false
+Explanation: The characters that appear in s are 'a' and 'b'.
+'a' occurs 3 times while 'b' occurs 2 times, which is not the same number of times.
+```
+
+**Constraints:**
+
+- `1 <= s.length <= 1000`
+- `s` consists of lowercase English letters.
+
+### My Solution
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var areOccurrencesEqual = function(s) {
+    let map = new Map();
+    for(let char of s){
+        if(map.has(char)){
+            let curr = map.get(char);
+            map.set(char, curr + 1);
+        } else {
+            map.set(char, 1);
+        }
+    }
+
+    return areAllValuesEqual(map);
+};
+
+function areAllValuesEqual(map) {
+    const values = Array.from(map.values()); 
+
+    if (values.length === 0) {
+        return true;
+    }
+
+    const firstValue = values[0];
+
+    return values.every(value => value === firstValue); 
+}
+
+```
+
+## 16. Subarray Sum Equals K
+
+Given an array of integers `nums` and an integer `k`, return *the total number of subarrays whose sum equals to* `k`.
+
+A subarray is a contiguous **non-empty** sequence of elements within an array.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,1,1], k = 2
+Output: 2
+```
+
+**Example 2:**
+
+```
+Input: nums = [1,2,3], k = 3
+Output: 2
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 2 * 104`
+- `-1000 <= nums[i] <= 1000`
+- `-107 <= k <= 107`
