@@ -1249,27 +1249,223 @@ Output: 16
 
 ### My Solution
 
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var numberOfSubarrays = function(nums, k) {
+    let currOdd = 0;
+    let oddMap = new Map();
+    oddMap.set(0, 1);
+    let result = 0;
+
+    for (let i = 0; i < nums.length; i++){
+        if (num[i] % 2 === 1){
+            currOdd += 1;
+        }
+        if(oddMap.has(currOdd - k)){
+            result += oddMap.get(currOdd - k);
+        }
+
+        oddMap.set(currOdd, (oddMap.get(currOdd) || 0) + 1);
+    }
+
+    return result;
+    
+};
+```
 
 
-## 18. 
 
+## 18. Find Players With Zero or One Losses
 
+You are given an integer array `matches` where `matches[i] = [winneri, loseri]` indicates that the player `winneri` defeated player `loseri` in a match.
+
+Return *a list* `answer` *of size* `2` *where:*
+
+- `answer[0]` is a list of all players that have **not** lost any matches.
+- `answer[1]` is a list of all players that have lost exactly **one** match.
+
+The values in the two lists should be returned in **increasing** order.
+
+**Note:**
+
+- You should only consider the players that have played **at least one** match.
+- The testcases will be generated such that **no** two matches will have the **same** outcome. 
+
+**Example 1:**
+
+```
+Input: matches = [[1,3],[2,3],[3,6],[5,6],[5,7],[4,5],[4,8],[4,9],[10,4],[10,9]]
+Output: [[1,2,10],[4,5,7,8]]
+Explanation:
+Players 1, 2, and 10 have not lost any matches.
+Players 4, 5, 7, and 8 each have lost one match.
+Players 3, 6, and 9 each have lost two matches.
+Thus, answer[0] = [1,2,10] and answer[1] = [4,5,7,8].
+```
+
+**Example 2:**
+
+```
+Input: matches = [[2,3],[1,3],[5,4],[6,4]]
+Output: [[1,2,5,6],[]]
+Explanation:
+Players 1, 2, 5, and 6 have not lost any matches.
+Players 3 and 4 each have lost two matches.
+Thus, answer[0] = [1,2,5,6] and answer[1] = [].
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= matches.length <= 105`
+- `matches[i].length == 2`
+- `1 <= winneri, loseri <= 105`
+- `winneri != loseri`
+- All `matches[i]` are **unique**.
 
 ### My Solution
 
+```javascript
+/**
+ * @param {number[][]} matches
+ * @return {number[][]}
+ */
+var findWinners = function(matches) {
+    let result = [[], []]
+    
+    let loseMap = new Map();
+    
+    for (let match of matches){
+        loseMap.set(match[0], loseMap.get(match[0]) || 0)
+        loseMap.set(match[1], (loseMap.get(match[1])|| 0) + 1); 
+    }
+    
+    loseMap.forEach((value, key) => {
+        if (value === 0){
+            result[0].push(key);
+        } else if(value === 1){
+            result[1].push(key);
+        }
+    });
+    result[0].sort((a, b) => (a - b));
+    result[1].sort((a, b) => (a - b));
+    return result;
+    
+};
+```
 
 
-## 19. 
 
+## 19. Largest Unique Number
 
+Given an integer array `nums`, return *the largest integer that only occurs once*. If no integer occurs once, return `-1`.
+
+**Example 1:**
+
+```
+Input: nums = [5,7,3,9,4,9,8,3,1]
+Output: 8
+Explanation: The maximum integer in the array is 9 but it is repeated. The number 8 occurs only once, so it is the answer.
+```
+
+**Example 2:**
+
+```
+Input: nums = [9,9,8,8]
+Output: -1
+Explanation: There is no number that occurs only once.
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 2000`
+- `0 <= nums[i] <= 1000`
 
 ### My Solution
 
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var largestUniqueNumber = function(nums) {
+    let occurenceMap = new Map();
+    
+    for (let num of nums){
+        occurenceMap.set(num, (occurenceMap.get(num) || 0) + 1);
+    }
+    
+    let max = -1;
+    occurenceMap.forEach((value, key) => {
+        if(value === 1){
+            if(key > max){
+                max = key;
+            }
+        }
+    });
+    
+    return max;
+    
+};
+```
 
+## 20. Maximum Number of Balloons
 
-## 20. 
+Given a string `text`, you want to use the characters of `text` to form as many instances of the word **"balloon"** as possible.
 
+You can use each character in `text` **at most once**. Return the maximum number of instances that can be formed.
 
+**Example 1:**
+
+**![img](https://assets.leetcode.com/uploads/2019/09/05/1536_ex1_upd.JPG)**
+
+```
+Input: text = "nlaebolko"
+Output: 1
+```
+
+**Example 2:**
+
+**![img](https://assets.leetcode.com/uploads/2019/09/05/1536_ex2_upd.JPG)**
+
+```
+Input: text = "loonbalxballpoon"
+Output: 2
+```
+
+**Example 3:**
+
+```
+Input: text = "leetcode"
+Output: 0 
+```
+
+**Constraints:**
+
+- `1 <= text.length <= 104`
+- `text` consists of lower case English letters only.
 
 ### My Solution
+
+```javascript
+/**
+ * @param {string} text
+ * @return {number}
+ */
+var maxNumberOfBalloons = function(text) {
+    let letterMap = new Map();
+    
+    for(let i = 0; i < text.length; i++){
+        letterMap.set(text[i], (letterMap.get(text[i]) || 0) + 1);
+    }
+    
+    return Math.min(letterMap.get('b') || 0, letterMap.get('a') || 0, Math.floor((letterMap.get('l') || 0) / 2), Math.floor((letterMap.get('o') || 0) / 2), letterMap.get('n') || 0);
+    
+};
+```
 
