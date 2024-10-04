@@ -177,3 +177,50 @@ Output: [5]
 - `1 <= n <= 500`
 - `-500 <= Node.val <= 500`
 - `1 <= left <= right <= n`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @param {number} left
+ * @param {number} right
+ * @return {ListNode}
+ */
+var reverseBetween = function(head, left, right) {
+    if (left === right) {
+        return head;
+    }
+
+    let dummy = new ListNode(0);
+    dummy.next = head;
+    let prev = dummy;
+
+    // 移动 prev 指针到 left 位置的前一个节点
+    for (let i = 1; i < left; i++) {
+        prev = prev.next;
+    }
+
+    // curr 指向要翻转的子链表的第一个节点
+    let curr = prev.next;
+
+    // 开始翻转子链表
+    for (let i = 0; i < right - left; i++) {
+        let nextNode = curr.next;
+        curr.next = nextNode.next;
+        nextNode.next = prev.next;
+        prev.next = nextNode;
+    }
+
+    return dummy.next;
+};
+
+```
+
