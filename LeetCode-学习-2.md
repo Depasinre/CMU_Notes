@@ -302,3 +302,161 @@ var removeNthFromEnd = function(head, n) {
 };
 ```
 
+## 4. Valid Parentheses
+
+Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+
+An input string is valid if:
+
+1. Open brackets must be closed by the same type of brackets.
+2. Open brackets must be closed in the correct order.
+3. Every close bracket has a corresponding open bracket of the same type. 
+
+**Example 1:**
+
+​	**Input:** s = "()"
+
+​	**Output:** true
+
+**Example 2:**
+
+​	**Input:** s = "()[]{}"
+
+​	**Output:** true
+
+**Example 3:**
+
+​	**Input:** s = "(]"
+
+​	**Output:** false
+
+**Example 4:**
+
+​	**Input:** s = "([])"
+
+​	**Output:** true 
+
+**Constraints:**
+
+- `1 <= s.length <= 104`
+- `s` consists of parentheses only `'()[]{}'`.
+
+### My Solution: 
+
+```javascript
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isValid = function(s) {
+    let stack = [];
+
+    for(let i = 0; i < s.length; i++){
+        let top = stack[stack.length - 1];
+        if(s[i] === ')'){
+            if(top === '('){
+                stack.pop();
+            } else {
+                return false;
+            }
+        } else if(s[i] === ']'){
+            if(top === '['){
+                stack.pop();
+            } else {
+                return false;
+            }
+        } else if (s[i] === '}'){
+            if(top === '{'){
+                stack.pop();
+            } else {
+                return false;
+            }
+        } else {
+            stack.push(s[i]);
+        }        
+    }
+
+    if (stack.length != 0){
+        return false;
+    }
+    return true; 
+};
+```
+
+### Solution with more clear code with JavaScript Object
+
+```javascript
+var isValid = function(s) {
+    let stack = [];
+    let map = {
+        ')': '(',
+        ']': '[',
+        '}': '{'
+    };
+
+    for(let i = 0; i < s.length; i++){
+        if (s[i] in map) {  // 如果是右括号
+            let top = stack.length === 0 ? '#' : stack.pop(); // 栈空时设置默认值
+            if (top !== map[s[i]]) {
+                return false;
+            }
+        } else {
+            stack.push(s[i]);  // 左括号直接入栈
+        }
+    }
+
+    return stack.length === 0;  // 检查栈是否为空
+};
+```
+
+##  5. Remove All Adjacent Duplicates In String
+
+You are given a string `s` consisting of lowercase English letters. A **duplicate removal** consists of choosing two **adjacent** and **equal** letters and removing them.
+
+We repeatedly make **duplicate removals** on `s` until we no longer can.
+
+Return *the final string after all such duplicate removals have been made*. It can be proven that the answer is **unique**.
+
+**Example 1:**
+
+```
+Input: s = "abbaca"
+Output: "ca"
+Explanation: 
+For example, in "abbaca" we could remove "bb" since the letters are adjacent and equal, and this is the only possible move.  The result of this move is that the string is "aaca", of which only "aa" is possible, so the final string is "ca".
+```
+
+**Example 2:**
+
+```
+Input: s = "azxxzy"
+Output: "ay"
+```
+
+**Constraints:**
+
+- `1 <= s.length <= 105`
+- `s` consists of lowercase English letters.
+
+### My Solution
+
+```javascript
+/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeDuplicates = function(s) {
+    let stack = []
+    for(let char of s){
+        if (char === stack[stack.length - 1]){
+            stack.pop();
+        } else {
+            stack.push(char);
+        }
+    }
+
+    return stack.join('');
+    
+};
+```
+
