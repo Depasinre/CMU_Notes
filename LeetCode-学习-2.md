@@ -460,3 +460,252 @@ var removeDuplicates = function(s) {
 };
 ```
 
+##  6. Backspace String Compare
+
+Given two strings `s` and `t`, return `true` *if they are equal when both are typed into empty text editors*. `'#'` means a backspace character.
+
+Note that after backspacing an empty text, the text will continue empty.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "ab#c", t = "ad#c"
+Output: true
+Explanation: Both s and t become "ac".
+```
+
+**Example 2:**
+
+```
+Input: s = "ab##", t = "c#d#"
+Output: true
+Explanation: Both s and t become "".
+```
+
+**Example 3:**
+
+```
+Input: s = "a#c", t = "b"
+Output: false
+Explanation: s becomes "c" while t becomes "b".
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= s.length, t.length <= 200`
+- `s` and `t` only contain lowercase letters and `'#'` characters.
+
+### My Solution
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var backspaceCompare = function(s, t) {
+    let stackS = [];
+    let stackT = [];
+    let length = Math.max(s.length, t.length);
+
+    for (let i = 0; i < length; i++){
+        if(s[i]){
+            if(s[i] === '#'){
+                stackS.pop();
+            } else {
+                stackS.push(s[i]);
+            }
+        }
+
+        if(t[i]){
+            if(t[i] ==='#'){
+                stackT.pop();
+            } else {
+                stackT.push(t[i]);
+            }
+        }
+    }
+
+    if(stackS.length != stackT.length){
+        return false;
+    }
+
+    for(let j = 0; j < stackS.length; j++){
+        if(stackS[j] != stackT[j]){
+            return false;
+        }
+    }
+
+    return true;
+    
+};
+```
+
+### Better Space Complexity Solution with Two Pointer
+
+ ```javascript
+ var backspaceCompare = function(s, t) {
+     let i = s.length - 1;
+     let j = t.length - 1;
+     
+     let skipS = 0, skipT = 0;
+ 
+     while (i >= 0 || j >= 0) {
+         // 处理 s 中的退格符
+         while (i >= 0) {
+             if (s[i] === '#') {
+                 skipS++;
+                 i--;
+             } else if (skipS > 0) {
+                 skipS--;
+                 i--;
+             } else {
+                 break;
+             }
+         }
+ 
+         // 处理 t 中的退格符
+         while (j >= 0) {
+             if (t[j] === '#') {
+                 skipT++;
+                 j--;
+             } else if (skipT > 0) {
+                 skipT--;
+                 j--;
+             } else {
+                 break;
+             }
+         }
+ 
+         // 比较有效字符
+         if (i >= 0 && j >= 0) {
+             if (s[i] !== t[j]) {
+                 return false;
+             }
+         } else {
+             if (i >= 0 || j >= 0) {
+                 return false;
+             }
+         }
+         i--;
+         j--;
+     }
+     
+     return true;
+ };
+ ```
+
+## 7. Simplify Path
+
+You are given an *absolute* path for a Unix-style file system, which always begins with a slash `'/'`. Your task is to transform this absolute path into its **simplified canonical path**.
+
+The *rules* of a Unix-style file system are as follows:
+
+- A single period `'.'` represents the current directory.
+- A double period `'..'` represents the previous/parent directory.
+- Multiple consecutive slashes such as `'//'` and `'///'` are treated as a single slash `'/'`.
+- Any sequence of periods that does **not match** the rules above should be treated as a **valid directory or** **file** **name**. For example, `'...' `and `'....'` are valid directory or file names.
+
+The simplified canonical path should follow these *rules*:
+
+- The path must start with a single slash `'/'`.
+- Directories within the path must be separated by exactly one slash `'/'`.
+- The path must not end with a slash `'/'`, unless it is the root directory.
+- The path must not have any single or double periods (`'.'` and `'..'`) used to denote current or parent directories.
+
+Return the **simplified canonical path**.
+
+**Example 1:**
+
+​	**Input:** path = "/home/"
+
+​	**Output:** "/home"
+
+​	**Explanation:**
+
+​	The trailing slash should be removed.
+
+**Example 2:**
+
+​	**Input:** path = "/home//foo/"
+
+​	**Output:** "/home/foo"
+
+​	**Explanation:**
+
+​	Multiple consecutive slashes are replaced by a single one.
+
+**Example 3:**
+
+​	**Input:** path = "/home/user/Documents/../Pictures"
+
+​	**Output:** "/home/user/Pictures"
+
+​	**Explanation:**
+
+​	A double period `".."` refers to the directory up a level (the parent directory).
+
+**Example 4:**
+
+​	**Input:** path = "/../"
+
+​	**Output:** "/"
+
+​	**Explanation:**
+
+​	Going one level up from the root directory is not possible.
+
+**Example 5:**
+
+​	**Input:** path = "/.../a/../b/c/../d/./"
+
+​	**Output:** "/.../b/d"
+
+​	**Explanation:**
+
+​	`"..."` is a valid name for a directory in this problem.
+
+**Constraints:**
+
+- `1 <= path.length <= 3000`
+- `path` consists of English letters, digits, period `'.'`, slash `'/'` or `'_'`.
+- `path` is a valid absolute Unix path.
+
+### My Solution
+
+```javascript
+/**
+ * @param {string} path
+ * @return {string}
+ */
+var simplifyPath = function(path) {
+    let array = path.split('/');
+    let resultStack = [];
+    
+    for(let i = 0; i < array.length; i++){
+        switch(array[i]){
+            case '.':
+            case '':
+            case ' ':
+                break;
+            case '..':
+                resultStack.pop();
+                break;
+            default:
+                resultStack.push(array[i]);
+        }
+        
+    }
+    
+    let result = '/' + resultStack.join('/');
+    
+    return result;
+};
+```
+
+
+
