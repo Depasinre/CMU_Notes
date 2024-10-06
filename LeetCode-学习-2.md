@@ -770,7 +770,7 @@ var makeGood = function(s) {
             continue;
         }
         if((char.toUpperCase() === stack[stack.length - 1].toUpperCase()) && (char != stack[stack.length - 1])){
-            stack.pop()                
+            stack.pop();            
         } else {
             stack.push(char);
         }
