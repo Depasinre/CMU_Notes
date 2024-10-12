@@ -855,3 +855,107 @@ MovingAverage.prototype.next = function(val) {
  */
 ```
 
+## 10. Contiguous Array
+
+Given a binary array `nums`, return *the maximum length of a contiguous subarray with an equal number of* `0` *and* `1`.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [0,1]
+Output: 2
+Explanation: [0, 1] is the longest contiguous subarray with an equal number of 0 and 1.
+```
+
+**Example 2:**
+
+```
+Input: nums = [0,1,0]
+Output: 2
+Explanation: [0, 1] (or [1, 0]) is a longest contiguous subarray with equal number of 0 and 1.
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= nums.length <= 105`
+- `nums[i]` is either `0` or `1`.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findMaxLength = function(nums) {
+    let map = new Map();
+    map.set(0, -1); // 处理从索引 0 开始的子数组
+    let maxLength = 0;
+    let runningSum = 0;
+
+    for (let i = 0; i < nums.length; i++) {
+        runningSum += nums[i] === 1 ? 1 : -1;
+
+        if (map.has(runningSum)) {
+            // 如果当前累加和已出现，计算子数组的长度
+            maxLength = Math.max(maxLength, i - map.get(runningSum));
+        } else {
+            // 记录当前累加和首次出现的位置
+            map.set(runningSum, i);
+        }
+    }
+    
+    return maxLength;
+};
+```
+
+
+
+### 问题的核心
+
+我们需要在一个二进制数组中，找到一个子数组，使得其中的 `0` 和 `1` 的数量相等。传统的暴力解法是通过双重循环检查每个子数组，并统计其中的 `0` 和 `1`，这种做法的时间复杂度为 O(n²)，在数组较大时会导致超时。
+
+### 优化思路的核心：累加和法
+
+1. **将问题转化为累加和问题**：
+   - 我们可以将 `0` 视为 `-1`，将 `1` 仍然视为 `1`。这样，每当数组中某个子数组的累加和为 `0` 时，就意味着这个子数组中 `0` 和 `1` 的数量是相等的。
+   - 比如数组 `[0, 1]` 可以转换为 `[-1, 1]`，其累加和为 `0`，所以 `0` 和 `1` 的数量相等。
+2. **使用哈希表来记录累加和的位置**：
+   - 我们可以使用一个哈希表来存储每个累加和第一次出现的位置。如果某个累加和再次出现，则表示从上次该累加和出现的位置到当前索引的子数组和为 `0`，即该子数组有相等数量的 `0` 和 `1`。
+   - 例如：假设累加和在索引 `i` 处为 `5`，而在索引 `j` 处再次为 `5`，那么从索引 `i+1` 到 `j` 的子数组的累加和为 `0`，即等数量的 `0` 和 `1`。
+3. **初始化哈希表**：
+   - 我们将累加和 `0` 初始化为 `-1`，这是为了处理从数组开头就满足条件的情况。例如，当整个数组从头开始就有相等数量的 `0` 和 `1` 时（即累加和为 `0`），此时子数组从索引 `0` 开始。
+
+### 具体实现步骤
+
+1. **初始化变量**：
+
+   - 使用 `runningSum` 记录当前的累加和。
+   - 使用 `map` 作为哈希表来存储每个累加和首次出现的索引。
+   - 初始化 `maxLength` 为 0，用来存储最大子数组的长度。
+
+2. **遍历数组**：
+
+   - 遍历数组中的每一个元素：
+
+     - 如果当前元素为 `1`，将 `runningSum` 加 `1`。
+     - 如果当前元素为 `0`，将 `runningSum` 减 `1`（因为我们将 `0` 视为 `-1`）。
+
+   - 对每个元素，检查当前的 
+
+     ```
+     runningSum
+     ```
+
+      是否已经在哈希表中存在：
+
+     - 如果存在，说明从上次出现该累加和的位置到当前位置的子数组的累加和为 `0`，即该子数组中的 `0` 和 `1` 数量相等。我们计算该子数组的长度，并更新 `maxLength`。
+     - 如果不存在，将当前 `runningSum` 及其对应的索引存入哈希表，表示这个累加和首次出现。
+
+3. **返回结果**：
+
+   - 最后返回 `maxLength`，即找到的最长子数组的长度。
