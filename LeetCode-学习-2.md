@@ -1455,10 +1455,164 @@ Input: p = [1,2,1], q = [1,1,2]
 Output: false
 ```
 
- 
-
 **Constraints:**
 
 - The number of nodes in both trees is in the range `[0, 100]`.
 - `-104 <= Node.val <= 104`
-- 
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {boolean}
+ */
+var isSameTree = function(p, q) {
+
+    if(p === null){
+        if(q === null){
+            return true;
+        } else {
+            return false;
+        }
+    } 
+
+    if(q === null){
+        if(p === null){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    if(p.val != q.val){
+        return false;
+    } else {
+        return isSameTree(p.left,q.left) && isSameTree(p.right, q.right);
+    }
+    
+};
+```
+
+
+
+### Better Logic Solution
+
+```javascript
+var isSameTree = function(p, q) {
+    // 如果 p 和 q 都是 null，则它们是相同的树
+    if (p === null && q === null) {
+        return true;
+    }
+
+    // 如果只有一个是 null 或者它们的值不同，则它们不是相同的树
+    if (p === null || q === null || p.val !== q.val) {
+        return false;
+    }
+
+    // 递归检查左子树和右子树
+    return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+};
+```
+
+## 18. Lowest Common Ancestor of a Binary Tree
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+According to the [definition of LCA on Wikipedia](https://en.wikipedia.org/wiki/Lowest_common_ancestor): “The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**).”
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+Output: 3
+Explanation: The LCA of nodes 5 and 1 is 3.
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+Output: 5
+Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
+```
+
+**Example 3:**
+
+```
+Input: root = [1,2], p = 1, q = 2
+Output: 1
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[2, 105]`.
+- `-109 <= Node.val <= 109`
+- All `Node.val` are **unique**.
+- `p != q`
+- `p` and `q` will exist in the tree.
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+var lowestCommonAncestor = function(root, p, q) {
+    // 到leaf节点还没有找到p或q
+    if(root === null){
+        return null;
+    }
+	
+    // 找到p, 返回
+    if(root.val === p.val){
+        return root;
+    }
+    
+	// 找到q, 返回
+    if(root.val === q.val){
+        return root;
+    }
+	
+    // 继续查找subtree
+    let left = lowestCommonAncestor(root.left, p, q);
+    let right = lowestCommonAncestor(root.right, p, q);
+	
+    // 如果左边找到了一个, 右边找到一个, 说明当前节点就是LCA (这是第一个能满足p和q在左右两侧的节点)
+    if(left && right){
+        return root;
+    }
+	
+    // 如果只找到一个, 说明另一个在另一侧的子树上
+    return left === null ? right : left;
+    
+};
+```
+
