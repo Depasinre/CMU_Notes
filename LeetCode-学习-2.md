@@ -933,29 +933,532 @@ var findMaxLength = function(nums) {
 ### 具体实现步骤
 
 1. **初始化变量**：
-
    - 使用 `runningSum` 记录当前的累加和。
    - 使用 `map` 作为哈希表来存储每个累加和首次出现的索引。
    - 初始化 `maxLength` 为 0，用来存储最大子数组的长度。
-
 2. **遍历数组**：
-
    - 遍历数组中的每一个元素：
-
      - 如果当前元素为 `1`，将 `runningSum` 加 `1`。
      - 如果当前元素为 `0`，将 `runningSum` 减 `1`（因为我们将 `0` 视为 `-1`）。
-
-   - 对每个元素，检查当前的 
-
-     ```
-     runningSum
-     ```
-
-      是否已经在哈希表中存在：
-
+   - 对每个元素，检查当前的 `runningSum`是否已经在哈希表中存在：
      - 如果存在，说明从上次出现该累加和的位置到当前位置的子数组的累加和为 `0`，即该子数组中的 `0` 和 `1` 数量相等。我们计算该子数组的长度，并更新 `maxLength`。
      - 如果不存在，将当前 `runningSum` 及其对应的索引存入哈希表，表示这个累加和首次出现。
-
 3. **返回结果**：
-
    - 最后返回 `maxLength`，即找到的最长子数组的长度。
+
+## 11. Minimum Depth of Binary Tree
+
+Given a binary tree, find its minimum depth.
+
+The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+
+**Note:** A leaf is a node with no children.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/12/ex_depth.jpg)
+
+```
+Input: root = [3,9,20,null,null,15,7]
+Output: 2
+```
+
+**Example 2:**
+
+```
+Input: root = [2,null,3,null,4,null,5,null,6]
+Output: 5
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 105]`.
+- `-1000 <= Node.val <= 1000`
+
+
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var minDepth = function(root) {
+    
+    if(root === null){
+        return 0;
+    }
+    
+    let left = minDepth(root.left);
+    let right = minDepth(root.right);
+    
+    if(left === 0){
+        return right + 1;
+    }
+    
+    if (right === 0){
+        return left + 1;
+        
+    }
+    return Math.min(left, right) + 1
+};
+```
+
+### Better Logic Solution
+
+```javascript
+var minDepth = function(root) {
+    // 如果节点为空，返回 0
+    if (root === null) {
+        return 0;
+    }
+
+    // 如果左子树为空，递归计算右子树的深度
+    if (root.left === null) {
+        return minDepth(root.right) + 1;
+    }
+
+    // 如果右子树为空，递归计算左子树的深度
+    if (root.right === null) {
+        return minDepth(root.left) + 1;
+    }
+
+    // 如果左右子树都存在，取两者的最小深度并加 1
+    return Math.min(minDepth(root.left), minDepth(root.right)) + 1;
+};
+
+```
+
+
+
+## 12. Maximum Depth of Binary Tree
+
+Given the `root` of a binary tree, return *its maximum depth*.
+
+A binary tree's **maximum depth** is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/26/tmp-tree.jpg)
+
+```
+Input: root = [3,9,20,null,null,15,7]
+Output: 3
+```
+
+**Example 2:**
+
+```
+Input: root = [1,null,2]
+Output: 2
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 104]`.
+- `-100 <= Node.val <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function(root) {
+    if(root === null){
+        return 0;
+    }
+
+    let left = maxDepth(root.left);
+    let right = maxDepth(root.right);
+
+    return Math.max(left, right) + 1; 
+};
+```
+
+## 13. Maximum Difference Between Node and Ancestor
+
+Given the `root` of a binary tree, find the maximum value `v` for which there exist **different** nodes `a` and `b` where `v = |a.val - b.val|` and `a` is an ancestor of `b`.
+
+A node `a` is an ancestor of `b` if either: any child of `a` is equal to `b` or any child of `a` is an ancestor of `b`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/09/tmp-tree.jpg)
+
+```
+Input: root = [8,3,10,1,6,null,14,null,null,4,7,13]
+Output: 7
+Explanation: We have various ancestor-node differences, some of which are given below :
+|8 - 3| = 5
+|3 - 7| = 4
+|8 - 1| = 7
+|10 - 13| = 3
+Among all possible differences, the maximum value of 7 is obtained by |8 - 1| = 7.
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/09/tmp-tree-1.jpg)
+
+```
+Input: root = [1,null,2,null,0,3]
+Output: 3
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[2, 5000]`.
+- `0 <= Node.val <= 105`
+
+ ### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxAncestorDiff = function(root) {
+    return findMaxAndMin(root, root.val, root.val);
+
+};
+
+function findMaxAndMin(root, min, max){
+    if(root === null){
+        return max - min;
+    }
+    max = Math.max(root.val, max);
+    min = Math.min(root.val, min);
+    let leftResult = findMaxAndMin(root.left, min, max);
+    let rightResult = findMaxAndMin(root.right,min, max);
+
+    return Math.max(leftResult, rightResult);
+
+
+}
+```
+
+## 14. Path Sum
+
+Given the `root` of a binary tree and an integer `targetSum`, return `true` if the tree has a **root-to-leaf** path such that adding up all the values along the path equals `targetSum`.
+
+A **leaf** is a node with no children.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/18/pathsum1.jpg)
+
+```
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+Output: true
+Explanation: The root-to-leaf path with the target sum is shown.
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/18/pathsum2.jpg)
+
+```
+Input: root = [1,2,3], targetSum = 5
+Output: false
+Explanation: There are two root-to-leaf paths in the tree:
+(1 --> 2): The sum is 3.
+(1 --> 3): The sum is 4.
+There is no root-to-leaf path with sum = 5.
+```
+
+**Example 3:**
+
+```
+Input: root = [], targetSum = 0
+Output: false
+Explanation: Since the tree is empty, there are no root-to-leaf paths.
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 5000]`.
+- `-1000 <= Node.val <= 1000`
+- `-1000 <= targetSum <= 1000`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} targetSum
+ * @return {boolean}
+ */
+var hasPathSum = function(root, targetSum) {
+
+    if(root === null){
+        return false;
+    }
+
+    if(root.left === null && root.right === null){
+        if(targetSum === root.val){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    let left = hasPathSum(root.left, targetSum - root.val);
+    let right = hasPathSum(root.right, targetSum - root.val);
+
+    return left || right
+    
+};
+```
+
+## 15. Diameter of Binary Tree
+
+Given the `root` of a binary tree, return *the length of the **diameter** of the tree*.
+
+The **diameter** of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the `root`.
+
+The **length** of a path between two nodes is represented by the number of edges between them.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/06/diamtree.jpg)
+
+```
+Input: root = [1,2,3,4,5]
+Output: 3
+Explanation: 3 is the length of the path [4,2,1,3] or [5,2,1,3].
+```
+
+**Example 2:**
+
+```
+Input: root = [1,2]
+Output: 1
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[1, 104]`.
+- `-100 <= Node.val <= 100`
+
+
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var diameterOfBinaryTree = function(root) {
+    let diameter = 0;
+    
+    function findLongestPath(node){
+        if(node === null){
+            return 0;
+        }
+
+        let leftPath = findLongestPath(node.left);
+        let rightPath = findLongestPath(node.right);
+        
+        diameter = Math.max(diameter, leftPath + rightPath);
+
+        return Math.max(leftPath, rightPath) + 1;
+    }
+    
+    findLongestPath(root);
+    
+    return diameter;
+    
+};
+```
+
+## 16. Count Good Nodes in Binary Tree
+
+Given a binary tree `root`, a node *X* in the tree is named **good** if in the path from root to *X* there are no nodes with a value *greater than* X.
+
+Return the number of **good** nodes in the binary tree.
+
+ 
+
+**Example 1:**
+
+**![img](https://assets.leetcode.com/uploads/2020/04/02/test_sample_1.png)**
+
+```
+Input: root = [3,1,4,3,null,1,5]
+Output: 4
+Explanation: Nodes in blue are good.
+Root Node (3) is always a good node.
+Node 4 -> (3,4) is the maximum value in the path starting from the root.
+Node 5 -> (3,4,5) is the maximum value in the path
+Node 3 -> (3,1,3) is the maximum value in the path.
+```
+
+**Example 2:**
+
+**![img](https://assets.leetcode.com/uploads/2020/04/02/test_sample_2.png)**
+
+```
+Input: root = [3,3,null,4,2]
+Output: 3
+Explanation: Node 2 -> (3, 3, 2) is not good, because "3" is higher than it.
+```
+
+**Example 3:**
+
+```
+Input: root = [1]
+Output: 1
+Explanation: Root is considered as good.
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the binary tree is in the range `[1, 10^5]`.
+- Each node's value is between `[-10^4, 10^4]`.
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var goodNodes = function(root) {
+    let num = 0;
+
+    function findGoodNode(root, max){
+        if(root === null){
+            return;
+        }
+        if(root.val >= max){
+            num += 1;
+            max = root.val;
+        }
+
+        findGoodNode(root.left, max);
+        findGoodNode(root.right, max);
+    }
+
+    findGoodNode(root, root.val);
+
+    return num;
+    
+};
+```
+
+## 17. Same Tree
+
+Given the roots of two binary trees `p` and `q`, write a function to check if they are the same or not.
+
+Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/20/ex1.jpg)
+
+```
+Input: p = [1,2,3], q = [1,2,3]
+Output: true
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/20/ex2.jpg)
+
+```
+Input: p = [1,2], q = [1,null,2]
+Output: false
+```
+
+**Example 3:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/20/ex3.jpg)
+
+```
+Input: p = [1,2,1], q = [1,1,2]
+Output: false
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in both trees is in the range `[0, 100]`.
+- `-104 <= Node.val <= 104`
+- 
