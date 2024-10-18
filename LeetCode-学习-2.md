@@ -1616,3 +1616,594 @@ var lowestCommonAncestor = function(root, p, q) {
 };
 ```
 
+## 19. Binary Tree Right Side View
+
+Given the `root` of a binary tree, imagine yourself standing on the **right side** of it, return *the values of the nodes you can see ordered from top to bottom*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/14/tree.jpg)
+
+```
+Input: root = [1,2,3,null,5,null,4]
+Output: [1,3,4]
+```
+
+**Example 2:**
+
+```
+Input: root = [1,null,3]
+Output: [1,3]
+```
+
+**Example 3:**
+
+```
+Input: root = []
+Output: []
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 100]`.
+- `-100 <= Node.val <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+var rightSideView = function(root) {
+    let queue = [root];
+    let result = [];
+    if(root === null){
+        return [];
+    }
+
+    while(queue.length){
+        result.push(queue[queue.length - 1].val);
+
+        let nextlevelNodes = [];
+
+        queue.forEach((value)=>{
+            if(value.left){
+                nextlevelNodes.push(value.left);
+            }
+
+            if(value.right){
+                nextlevelNodes.push(value.right);
+            }
+        });
+
+        queue = nextlevelNodes;
+    }
+
+    return result;
+    
+};
+```
+
+## 20. Find Largest Value in Each Tree Row
+
+Given the `root` of a binary tree, return *an array of the largest value in each row* of the tree **(0-indexed)**.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/08/21/largest_e1.jpg)
+
+```
+Input: root = [1,3,2,5,3,null,9]
+Output: [1,3,9]
+```
+
+**Example 2:**
+
+```
+Input: root = [1,2,3]
+Output: [1,3]
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree will be in the range `[0, 104]`.
+- `-231 <= Node.val <= 231 - 1`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+var largestValues = function(root) {
+    if(root === null){
+        return [];
+    }
+    let queue = [root];
+    let result = [];
+
+    while(queue.length){
+        let maxThisRow = -Infinity;
+        let nextQueue = [];
+
+        queue.forEach(value => {
+            if(value.val > maxThisRow){
+                maxThisRow = value.val;
+            }
+            if(value.left){
+                nextQueue.push(value.left);
+            }
+            if(value.right){
+                nextQueue.push(value.right);
+            }
+        })
+        result.push(maxThisRow);
+        queue = nextQueue;
+    }
+
+    return result;
+    
+};
+```
+
+## 21. Deepest Leaves Sum
+
+Given the `root` of a binary tree, return *the sum of values of its deepest leaves*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2019/07/31/1483_ex1.png)
+
+```
+Input: root = [1,2,3,4,5,null,6,7,null,null,null,null,8]
+Output: 15
+```
+
+**Example 2:**
+
+```
+Input: root = [6,7,8,2,7,1,3,9,null,1,4,null,null,null,5]
+Output: 19
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[1, 104]`.
+- `1 <= Node.val <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var deepestLeavesSum = function(root) {
+    let queue = [root];
+    let leafLevel = {};
+    let currentDepth = 0;
+    while(queue.length){
+        let nextQueue = [];
+        let leafNodesValue = [];
+        queue.forEach((value) => {
+            if(value.left){
+                nextQueue.push(value.left);
+            }
+            
+            if(value.right){
+                nextQueue.push(value.right);
+            }
+            
+            // identif leaf node
+            if(value.left === null && value.right === null){
+                leafNodesValue.push(value.val);
+            }
+        })
+        
+        leafLevel[currentDepth]  = leafNodesValue;
+        currentDepth ++;
+        queue = nextQueue; 
+    }
+    
+    return leafLevel[currentDepth - 1].reduce((acc, current)=>{return acc + current}, 0);
+};
+```
+
+### Better Solution
+
+```javascript
+var deepestLeavesSum = function(root) {
+    let queue = [root];
+    let sum = 0;
+    
+    while (queue.length) {
+        sum = 0;  // 重置当前层级的和
+        const nextQueue = [];
+        
+        queue.forEach(node => {
+            sum += node.val;  // 累加当前节点的值
+            
+            if (node.left) nextQueue.push(node.left);
+            if (node.right) nextQueue.push(node.right);
+        });
+        
+        queue = nextQueue;  // 移动到下一层
+    }
+    
+    return sum;  // 返回最深层叶子节点的和
+};
+```
+
+## 22. Binary Tree Zigzag Level Order Traversal
+
+Given the `root` of a binary tree, return *the zigzag level order traversal of its nodes' values*. (i.e., from left to right, then right to left for the next level and alternate between).
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/tree1.jpg)
+
+```
+Input: root = [3,9,20,null,null,15,7]
+Output: [[3],[20,9],[15,7]]
+```
+
+**Example 2:**
+
+```
+Input: root = [1]
+Output: [[1]]
+```
+
+**Example 3:**
+
+```
+Input: root = []
+Output: []
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 2000]`.
+- `-100 <= Node.val <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+var zigzagLevelOrder = function(root) {
+    if(root === null){
+        return [];
+    }
+    let queue = [root];
+    let result = [];
+    
+    let flag = true;
+    
+    while(queue.length){
+        let nextQueue = [];
+        let nextQueueValue = [];
+        
+        queue.forEach(node => {
+            if(node.left){
+                nextQueue.push(node.left);
+            }
+            if(node.right){
+                nextQueue.push(node.right);
+            }
+            
+            switch(flag){
+                case true: 
+                    nextQueueValue.push(node.val);
+                    break;
+                case false:
+                    nextQueueValue.unshift(node.val);
+                    break;
+            }
+        });
+        
+      
+        
+        flag = !flag;
+        queue = nextQueue;
+        result.push(nextQueueValue);
+    }
+        
+    return result;
+    
+};
+```
+
+## 23. Range Sum of BST
+
+Given the `root` node of a binary search tree and two integers `low` and `high`, return *the sum of values of all nodes with a value in the **inclusive** range* `[low, high]`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/05/bst1.jpg)
+
+```
+Input: root = [10,5,15,3,7,null,18], low = 7, high = 15
+Output: 32
+Explanation: Nodes 7, 10, and 15 are in the range [7, 15]. 7 + 10 + 15 = 32.
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/05/bst2.jpg)
+
+```
+Input: root = [10,5,15,3,7,13,18,1,null,6], low = 6, high = 10
+Output: 23
+Explanation: Nodes 6, 7, and 10 are in the range [6, 10]. 6 + 7 + 10 = 23.
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[1, 2 * 104]`.
+- `1 <= Node.val <= 105`
+- `1 <= low <= high <= 105`
+- All `Node.val` are **unique**.
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} low
+ * @param {number} high
+ * @return {number}
+ */
+var rangeSumBST = function(root, low, high) {
+    if(root === null){
+        return 0;
+    }
+    let anwser = 0;
+
+    if(root.val >= low && root.val <= high){
+        anwser += root.val;
+    }
+
+    if(root.val > low){
+        anwser += rangeSumBST(root.left, low, high);
+    }
+
+    if(root.val < high){
+        anwser += rangeSumBST(root.right, low, high);
+    }
+
+    return anwser;
+};
+```
+
+## 24. Minimum Absolute Difference in BST
+
+Given the `root` of a Binary Search Tree (BST), return *the minimum absolute difference between the values of any two different nodes in the tree*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/05/bst1.jpg)
+
+```
+Input: root = [4,2,6,1,3]
+Output: 1
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/05/bst2.jpg)
+
+```
+Input: root = [1,0,48,null,null,12,49]
+Output: 1
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[2, 104]`.
+- `0 <= Node.val <= 105`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var getMinimumDifference = function(root) {
+    let prev = null;
+    let minDiff = Infinity;
+
+    function dfs(root){
+        if(root === null){
+            return;
+        }
+
+        dfs(root.left);
+        if(prev != null){
+            minDiff = Math.min(minDiff, Math.abs(prev-root.val));
+        }
+        prev = root.val;
+        dfs(root.right);
+    }
+
+    dfs(root);
+    return minDiff;
+    
+};
+```
+
+## 25. Validate Binary Search Tree
+
+Given the `root` of a binary tree, *determine if it is a valid binary search tree (BST)*.
+
+A **valid BST** is defined as follows:
+
+- The left
+
+   
+
+  subtree
+
+   
+
+  of a node contains only nodes with keys
+
+   
+
+  less than
+
+   
+
+  the node's key.
+
+- The right subtree of a node contains only nodes with keys **greater than** the node's key.
+
+- Both the left and right subtrees must also be binary search trees.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/01/tree1.jpg)
+
+```
+Input: root = [2,1,3]
+Output: true
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/01/tree2.jpg)
+
+```
+Input: root = [5,1,4,null,null,3,6]
+Output: false
+Explanation: The root node's value is 5 but its right child's value is 4.
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[1, 104]`.
+- `-231 <= Node.val <= 231 - 1`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isValidBST = function(root) {
+    let prev = null;
+    let indicator = true;
+    function dfs(node){
+        if(node === null){
+            return;
+        }
+
+        dfs(node.left);
+        if(prev != null){
+            if(prev >= node.val){
+                indicator = false;
+            }
+        }
+        prev = node.val;
+        dfs(node.right);
+
+        return;
+    }
+
+    dfs(root);
+
+    return indicator;
+    
+};
+```
+
