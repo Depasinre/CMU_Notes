@@ -2115,23 +2115,7 @@ Given the `root` of a binary tree, *determine if it is a valid binary search tre
 
 A **valid BST** is defined as follows:
 
-- The left
-
-   
-
-  subtree
-
-   
-
-  of a node contains only nodes with keys
-
-   
-
-  less than
-
-   
-
-  the node's key.
+- The left subtree of a node contains only nodes with keys less than the node's key.
 
 - The right subtree of a node contains only nodes with keys **greater than** the node's key.
 
@@ -2203,6 +2187,831 @@ var isValidBST = function(root) {
     dfs(root);
 
     return indicator;
+    
+};
+```
+
+## 26. Insert into a Binary Search Tree
+
+You are given the `root` node of a binary search tree (BST) and a `value` to insert into the tree. Return *the root node of the BST after the insertion*. It is **guaranteed** that the new value does not exist in the original BST.
+
+**Notice** that there may exist multiple valid ways for the insertion, as long as the tree remains a BST after insertion. You can return **any of them**.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/05/insertbst.jpg)
+
+```
+Input: root = [4,2,7,1,3], val = 5
+Output: [4,2,7,1,3,5]
+Explanation: Another accepted tree is:
+```
+
+**Example 2:**
+
+```
+Input: root = [40,20,60,10,30,50,70], val = 25
+Output: [40,20,60,10,30,50,70,null,null,25]
+```
+
+**Example 3:**
+
+```
+Input: root = [4,2,7,1,3,null,null,null,null,null,null], val = 5
+Output: [4,2,7,1,3,5]
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree will be in the range `[0, 104]`.
+- `-108 <= Node.val <= 108`
+- All the values `Node.val` are **unique**.
+- `-108 <= val <= 108`
+- It's **guaranteed** that `val` does not exist in the original BST.
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} val
+ * @return {TreeNode}
+ */
+var insertIntoBST = function(root, val) {
+    
+    if(root === null){
+        return new TreeNode(val, null, null);
+    }
+    
+    function insert(root, val){
+        if(root.left === null && root.right === null){
+            if(val < root.val){
+                root.left = new TreeNode(val, null, null);
+                return;
+            } else {
+                root.right = new TreeNode(val, null, null);
+                return;
+            }
+        }
+        
+        if(root.left === null && val < root.val){
+            root.left = new TreeNode(val, null, null);
+                return;
+        }
+        
+        if(root.right === null && val > root.val){
+            root.right = new TreeNode(val, null, null);
+                return;
+        }
+    
+        if(val < root.val){
+            insert(root.left, val);
+        } else {
+            insert(root.right, val);
+        }
+    }
+    
+    insert(root, val);
+    
+    return root;    
+};
+```
+
+### Better Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val === undefined ? 0 : val);
+ *     this.left = (left === undefined ? null : left);
+ *     this.right = (right === undefined ? null : right);
+ * }
+/**
+ * @param {TreeNode} root
+ * @param {number} val
+ * @return {TreeNode}
+ */
+var insertIntoBST = function(root, val) {
+    // 如果 root 是空树，返回一个新的节点作为根节点
+    if (root === null) {
+        return new TreeNode(val, null, null);
+    }
+    
+    // 插入的过程，找到正确位置
+    if (val < root.val) {
+        // 递归插入到左子树
+        root.left = insertIntoBST(root.left, val);
+    } else {
+        // 递归插入到右子树
+        root.right = insertIntoBST(root.right, val);
+    }
+
+    return root;
+};
+
+```
+
+## 27. Closest Binary Search Tree Value
+
+Given the `root` of a binary search tree and a `target` value, return *the value in the BST that is closest to the* `target`. If there are multiple answers, print the smallest.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/12/closest1-1-tree.jpg)
+
+```
+Input: root = [4,2,5,1,3], target = 3.714286
+Output: 4
+```
+
+**Example 2:**
+
+```
+Input: root = [1], target = 4.428571
+Output: 1
+```
+
+ 
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[1, 104]`.
+- `0 <= Node.val <= 109`
+- `-109 <= target <= 109`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} target
+ * @return {number}
+ */
+var closestValue = function(root, target) {
+    let closest = root.val;
+    
+    function findMinDiff(root){
+        if(root === null){
+            return;
+        }
+        let currSmallestDiff = Math.abs(target - closest);
+        let currDiff = Math.abs(target - root.val);
+        
+        if(currSmallestDiff === currDiff){
+            closest = Math.min(closest, root.val);
+        }
+        
+        if(currSmallestDiff > currDiff){
+            closest = root.val;
+        }
+        
+         if (target === root.val) {
+            closest = root.val;
+            return;
+        }
+        
+        if(target > root.val){
+            findMinDiff(root.right);       
+        } else {
+            findMinDiff(root.left);
+        }
+    }
+    
+    findMinDiff(root);
+    return closest;
+    
+};
+```
+
+##  28. Number of Provinces
+
+There are `n` cities. Some of them are connected, while some are not. If city `a` is connected directly with city `b`, and city `b` is connected directly with city `c`, then city `a` is connected indirectly with city `c`.
+
+A **province** is a group of directly or indirectly connected cities and no other cities outside of the group.
+
+You are given an `n x n` matrix `isConnected` where `isConnected[i][j] = 1` if the `ith` city and the `jth` city are directly connected, and `isConnected[i][j] = 0` otherwise.
+
+Return *the total number of **provinces***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/24/graph1.jpg)
+
+```
+Input: isConnected = [[1,1,0],[1,1,0],[0,0,1]]
+Output: 2
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/24/graph2.jpg)
+
+```
+Input: isConnected = [[1,0,0],[0,1,0],[0,0,1]]
+Output: 3
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= n <= 200`
+- `n == isConnected.length`
+- `n == isConnected[i].length`
+- `isConnected[i][j]` is `1` or `0`.
+- `isConnected[i][i] == 1`
+- `isConnected[i][j] == isConnected[j][i]`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[][]} isConnected
+ * @return {number}
+ */
+var findCircleNum = function(isConnected) {
+    // build the graph
+    let graph = new Map();
+    for(let i = 0; i < isConnected.length; i++){
+        graph.set(i, []);
+        for(let j = 0; j < isConnected.length; j++){
+            if(isConnected[i][j] === 1){
+                graph.get(i).push(j);
+            }
+        }
+    }
+
+    // make the seen set to prevent infinite search
+    let seen = new Set();
+	
+    // deep first search with traversal every node in the province of the input node
+    function dfs(node){
+        for(let neighbor of graph.get(node)){
+            if (!seen.has(neighbor)) {
+                seen.add(neighbor);
+                dfs(neighbor);
+            }
+        }
+    }
+
+    let ans = 0;
+
+    for(let i = 0; i < isConnected.length; i++){
+        if(!seen.has(i)){
+            ans ++;
+            // every time trigger a search means that a new province
+            dfs(i);
+        }
+    }
+
+    return ans;
+    
+};
+```
+
+## 29. Number of Islands
+
+Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return *the number of islands*.
+
+An **island** is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+**Example 1:**
+
+```
+Input: grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+Output: 1
+```
+
+**Example 2:**
+
+```
+Input: grid = [
+  ["1","1","0","0","0"],
+  ["1","1","0","0","0"],
+  ["0","0","1","0","0"],
+  ["0","0","0","1","1"]
+]
+Output: 3
+```
+
+ 
+
+**Constraints:**
+
+- `m == grid.length`
+- `n == grid[i].length`
+- `1 <= m, n <= 300`
+- `grid[i][j]` is `'0'` or `'1'`.
+
+### My Solution
+
+```javascript
+/**
+ * @param {character[][]} grid
+ * @return {number}
+ */
+var numIslands = function(grid) {
+    let direction = [
+        [-1, 0], 
+        [0, 1], 
+        [0, -1], 
+        [1, 0]
+    ];
+
+    let seen = [];
+    
+    for (let i = 0; i < grid.length; i++) {
+        seen.push(new Array(grid[0].length).fill(false));
+    }
+
+    function validIslandNeighbor(row, col){
+        return row >= 0 && col >= 0 && row < grid.length && col < grid[0].length && grid[row][col] === '1';
+    }
+
+    function dfs(row, col){
+        for(const[dx, dy] of direction){
+            let nextRow = row + dx;
+            let nextCol = col + dy;
+            if(validIslandNeighbor(nextRow, nextCol) && !seen[nextRow][nextCol]){
+                seen[nextRow][nextCol] = true;
+                dfs(nextRow, nextCol);
+            }  
+        }
+    }
+
+    let ans = 0;
+
+    for(let i = 0;  i < grid.length; i++){
+        for(let j = 0; j < grid[0].length; j++){
+            if(grid[i][j] === '1' && !seen[i][j]){
+                ans ++;
+                seen[i][j] = true;
+                dfs(i, j);
+            }
+        }
+    }
+
+    return ans
+    
+};
+```
+
+## 30. Reorder Routes to Make All Paths Lead to the City Zero
+
+There are `n` cities numbered from `0` to `n - 1` and `n - 1` roads such that there is only one way to travel between two different cities (this network form a tree). Last year, The ministry of transport decided to orient the roads in one direction because they are too narrow.
+
+Roads are represented by `connections` where `connections[i] = [ai, bi]` represents a road from city `ai` to city `bi`.
+
+This year, there will be a big event in the capital (city `0`), and many people want to travel to this city.
+
+Your task consists of reorienting some roads such that each city can visit the city `0`. Return the **minimum** number of edges changed.
+
+It's **guaranteed** that each city can reach city `0` after reorder.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/05/13/sample_1_1819.png)
+
+```
+Input: n = 6, connections = [[0,1],[1,3],[2,3],[4,0],[4,5]]
+Output: 3
+Explanation: Change the direction of edges show in red such that each node can reach the node 0 (capital).
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/05/13/sample_2_1819.png)
+
+```
+Input: n = 5, connections = [[1,0],[1,2],[3,2],[3,4]]
+Output: 2
+Explanation: Change the direction of edges show in red such that each node can reach the node 0 (capital).
+```
+
+**Example 3:**
+
+```
+Input: n = 3, connections = [[1,0],[2,0]]
+Output: 0
+```
+
+ 
+
+**Constraints:**
+
+- `2 <= n <= 5 * 104`
+- `connections.length == n - 1`
+- `connections[i].length == 2`
+- `0 <= ai, bi <= n - 1`
+- `ai != bi`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number} n
+ * @param {number[][]} connections
+ * @return {number}
+ */
+var minReorder = function(n, connections) {
+
+    // make the graph
+    let map = new Map();
+    let road = new Set();
+    let seen = new Set();
+
+    for(let i = 0; i < connections.length; i++){
+        if(!map.has(connections[i][0])){
+            map.set(connections[i][0], []);
+        }
+        if(!map.has(connections[i][1])){
+            map.set(connections[i][1], []);
+        }
+        map.get(connections[i][0]).push(connections[i][1]);
+        map.get(connections[i][1]).push(connections[i][0]);
+        road.add(JSON.stringify(connections[i]));
+    }
+
+    let ans = 0;
+    function dfs(node){
+        for(const neighbor of map.get(node)){
+            if(!seen.has(neighbor)){
+                if(road.has(JSON.stringify([node, neighbor]))){
+                    ans += 1;
+                }
+                seen.add(neighbor);
+                dfs(neighbor);
+            }
+        }
+        
+    }
+
+    seen.add(0);
+    dfs(0);
+
+    return ans;
+    
+};
+```
+
+## 31. Keys and Rooms
+
+There are `n` rooms labeled from `0` to `n - 1` and all the rooms are locked except for room `0`. Your goal is to visit all the rooms. However, you cannot enter a locked room without having its key.
+
+When you visit a room, you may find a set of **distinct keys** in it. Each key has a number on it, denoting which room it unlocks, and you can take all of them with you to unlock the other rooms.
+
+Given an array `rooms` where `rooms[i]` is the set of keys that you can obtain if you visited room `i`, return `true` *if you can visit **all** the rooms, or* `false` *otherwise*.
+
+ 
+
+**Example 1:**
+
+```
+Input: rooms = [[1],[2],[3],[]]
+Output: true
+Explanation: 
+We visit room 0 and pick up key 1.
+We then visit room 1 and pick up key 2.
+We then visit room 2 and pick up key 3.
+We then visit room 3.
+Since we were able to visit every room, we return true.
+```
+
+**Example 2:**
+
+```
+Input: rooms = [[1,3],[3,0,1],[2],[0]]
+Output: false
+Explanation: We can not enter room number 2 since the only key that unlocks it is in that room.
+```
+
+ 
+
+**Constraints:**
+
+- `n == rooms.length`
+- `2 <= n <= 1000`
+- `0 <= rooms[i].length <= 1000`
+- `1 <= sum(rooms[i].length) <= 3000`
+- `0 <= rooms[i][j] < n`
+- All the values of `rooms[i]` are **unique**.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[][]} rooms
+ * @return {boolean}
+ */
+var canVisitAllRooms = function(rooms) {
+
+    let seen = new Set();
+
+    function dfs(openRoom){
+        for(const roomCanBeOpen of rooms[openRoom]){
+            if(!seen.has(roomCanBeOpen)){
+                seen.add(roomCanBeOpen);
+                dfs(roomCanBeOpen);
+            }
+        }
+    }
+
+    seen.add(0);
+    dfs(0);
+
+    if(seen.size === rooms.length){
+        return true;
+    } else {
+        return false;
+    }
+};
+```
+
+## 32. Minimum Number of Vertices to Reach All Nodes
+
+Given a **directed acyclic graph**, with `n` vertices numbered from `0` to `n-1`, and an array `edges` where `edges[i] = [fromi, toi]` represents a directed edge from node `fromi` to node `toi`.
+
+Find *the smallest set of vertices from which all nodes in the graph are reachable*. It's guaranteed that a unique solution exists.
+
+Notice that you can return the vertices in any order.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/07/07/untitled22.png)
+
+```
+Input: n = 6, edges = [[0,1],[0,2],[2,5],[3,4],[4,2]]
+Output: [0,3]
+Explanation: It's not possible to reach all the nodes from a single vertex. From 0 we can reach [0,1,2,5]. From 3 we can reach [3,4,2,5]. So we output [0,3].
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/07/07/untitled.png)
+
+```
+Input: n = 5, edges = [[0,1],[2,1],[3,1],[1,4],[2,4]]
+Output: [0,2,3]
+Explanation: Notice that vertices 0, 3 and 2 are not reachable from any other node, so we must include them. Also any of these vertices can reach nodes 1 and 4.
+```
+
+ 
+
+**Constraints:**
+
+- `2 <= n <= 10^5`
+- `1 <= edges.length <= min(10^5, n * (n - 1) / 2)`
+- `edges[i].length == 2`
+- `0 <= fromi, toi < n`
+- All pairs `(fromi, toi)` are distinct.
+
+### My Solution
+
+The answer is the number of nodes with 0 indegree.
+
+```javascript
+/**
+ * @param {number} n
+ * @param {number[][]} edges
+ * @return {number[]}
+ */
+var findSmallestSetOfVertices = function(n, edges) {
+    // find the vertices wich indegree is 0;
+    let zeroIndegreeNode = new Array(n).fill(0);
+    edges.forEach((([from, target]) =>{
+        zeroIndegreeNode[target] += 1;
+    }))
+
+    let ans = [];
+    zeroIndegreeNode.forEach((value, index) => {
+        if(value === 0){
+            ans.push(index);
+        }
+    })
+    
+    return ans;
+};
+```
+
+## 33. Find if Path Exists in Graph
+
+There is a **bi-directional** graph with `n` vertices, where each vertex is labeled from `0` to `n - 1` (**inclusive**). The edges in the graph are represented as a 2D integer array `edges`, where each `edges[i] = [ui, vi]` denotes a bi-directional edge between vertex `ui` and vertex `vi`. Every vertex pair is connected by **at most one** edge, and no vertex has an edge to itself.
+
+You want to determine if there is a **valid path** that exists from vertex `source` to vertex `destination`.
+
+Given `edges` and the integers `n`, `source`, and `destination`, return `true` *if there is a **valid path** from* `source` *to* `destination`*, or* `false` *otherwise**.*
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/08/14/validpath-ex1.png)
+
+```
+Input: n = 3, edges = [[0,1],[1,2],[2,0]], source = 0, destination = 2
+Output: true
+Explanation: There are two paths from vertex 0 to vertex 2:
+- 0 → 1 → 2
+- 0 → 2
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/08/14/validpath-ex2.png)
+
+```
+Input: n = 6, edges = [[0,1],[0,2],[3,5],[5,4],[4,3]], source = 0, destination = 5
+Output: false
+Explanation: There is no path from vertex 0 to vertex 5.
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= n <= 2 * 105`
+- `0 <= edges.length <= 2 * 105`
+- `edges[i].length == 2`
+- `0 <= ui, vi <= n - 1`
+- `ui != vi`
+- `0 <= source, destination <= n - 1`
+- There are no duplicate edges.
+- There are no self edges.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number} n
+ * @param {number[][]} edges
+ * @param {number} source
+ * @param {number} destination
+ * @return {boolean}
+ */
+var validPath = function(n, edges, source, destination) {
+    
+    if(n < 2){
+        return true;
+    }
+    
+    if(source === destination){
+        return true;
+    }
+    
+    // make the graph
+    let graph = new Map();
+    
+    edges.forEach(([a, b]) =>{
+        if(!graph.has(a)){
+            graph.set(a, []);
+        }
+        
+        if(!graph.has(b)){
+            graph.set(b, []);
+        }
+        
+        graph.get(a).push(b);
+        graph.get(b).push(a);
+    })
+    
+    let seen = new Set();
+    let result= false;
+    
+    function dfs(node){
+        for(const neighbor of graph.get(node)){
+            if(!seen.has(neighbor)){
+               if(neighbor === destination){
+                   result = true;
+                   return;
+               }
+                seen.add(neighbor);
+                dfs(neighbor);
+            }
+        }
+    }
+    
+    seen.add(source);
+    dfs(source);
+    
+    return result;
+    
+};
+```
+
+## 34. Number of Connected Components in an Undirected Graph
+
+You have a graph of `n` nodes. You are given an integer `n` and an array `edges` where `edges[i] = [ai, bi]` indicates that there is an edge between `ai` and `bi` in the graph.
+
+Return *the number of connected components in the graph*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/14/conn1-graph.jpg)
+
+```
+Input: n = 5, edges = [[0,1],[1,2],[3,4]]
+Output: 2
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/14/conn2-graph.jpg)
+
+```
+Input: n = 5, edges = [[0,1],[1,2],[2,3],[3,4]]
+Output: 1
+```
+
+ 
+
+**Constraints:**
+
+- `1 <= n <= 2000`
+- `1 <= edges.length <= 5000`
+- `edges[i].length == 2`
+- `0 <= ai <= bi < n`
+- `ai != bi`
+- There are no repeated edges.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number} n
+ * @param {number[][]} edges
+ * @return {number}
+ */
+var countComponents = function(n, edges) {
+    
+    // make the graph
+    let graph = new Map();
+    let seen = new Set();
+    
+    for(let i = 0; i < n; i++){
+        graph.set(i, []);
+    }
+    
+    edges.forEach(([a, b], index) =>{
+        graph.get(a).push(b);
+        graph.get(b).push(a);
+    })
+    
+    function dfs(node){
+        for(const neighbor of graph.get(node)){
+            if(!seen.has(neighbor)){
+                seen.add(neighbor);
+                dfs(neighbor);
+            }
+        }
+    }
+    
+    let ans = 0;
+    
+    for(let i = 0; i < n; i++){
+        if(!seen.has(i)){
+            ans++;
+            seen.add(i);
+            dfs(i);
+        }
+    }
+    
+    return ans;
     
 };
 ```
