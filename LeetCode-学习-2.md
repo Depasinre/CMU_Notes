@@ -3016,3 +3016,205 @@ var countComponents = function(n, edges) {
 };
 ```
 
+## 35. Max Area of Island
+
+You are given an `m x n` binary matrix `grid`. An island is a group of `1`'s (representing land) connected **4-directionally** (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+The **area** of an island is the number of cells with a value `1` in the island.
+
+Return *the maximum **area** of an island in* `grid`. If there is no island, return `0`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/05/01/maxarea1-grid.jpg)
+
+```
+Input: grid = [[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]]
+Output: 6
+Explanation: The answer is not 11, because the island must be connected 4-directionally.
+```
+
+**Example 2:**
+
+```
+Input: grid = [[0,0,0,0,0,0,0,0]]
+Output: 0
+```
+
+ 
+
+**Constraints:**
+
+- `m == grid.length`
+- `n == grid[i].length`
+- `1 <= m, n <= 50`
+- `grid[i][j]` is either `0` or `1`.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[][]} grid
+ * @return {number}
+ */
+var maxAreaOfIsland = function(grid) {
+    
+    let m = grid.length;
+    let n = grid[0].length;
+    
+    let direction = [
+        [1, 0],
+        [0, 1], 
+        [-1, 0], 
+        [0, -1]
+    ];
+    
+    function valid(row, col){
+        return row >= 0 && row < m && col >= 0 && col < n && grid[row][col] === 1;
+    }
+    
+    // make the seen array
+    
+    let seen = [];
+    
+    for(let i = 0; i < m; i++){
+        seen.push(new Array(n).fill(false));
+    }
+    
+    let area = 0;
+    let maxArea = 0;
+    
+    function dfs(row, col){
+        for(const [dx, dy] of direction){
+            let newRow = row + dx;
+            let newCol = col + dy;
+            
+            if(valid(newRow, newCol) && !seen[newRow][newCol]){
+                seen[newRow][newCol] = true;
+                area ++;
+                dfs(newRow, newCol);
+            }
+        }
+        
+    }
+    
+    
+    for(let i = 0; i < m; i++){
+        for(let j = 0; j < n; j++){
+            area = 0;
+            if(grid[i][j] === 1 && seen[i][j] === false){
+                area ++;
+                seen[i][j] = true;
+                dfs(i, j);
+                maxArea = Math.max(maxArea, area);
+            }
+            
+        }
+    }
+    
+    return maxArea;
+    
+};
+```
+
+## 36. Reachable Nodes With Restrictions
+
+There is an undirected tree with `n` nodes labeled from `0` to `n - 1` and `n - 1` edges.
+
+You are given a 2D integer array `edges` of length `n - 1` where `edges[i] = [ai, bi]` indicates that there is an edge between nodes `ai` and `bi` in the tree. You are also given an integer array `restricted` which represents **restricted** nodes.
+
+Return *the **maximum** number of nodes you can reach from node* `0` *without visiting a restricted node.*
+
+Note that node `0` will **not** be a restricted node.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2022/06/15/ex1drawio.png)
+
+```
+Input: n = 7, edges = [[0,1],[1,2],[3,1],[4,0],[0,5],[5,6]], restricted = [4,5]
+Output: 4
+Explanation: The diagram above shows the tree.
+We have that [0,1,2,3] are the only nodes that can be reached from node 0 without visiting a restricted node.
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2022/06/15/ex2drawio.png)
+
+```
+Input: n = 7, edges = [[0,1],[0,2],[0,5],[0,4],[3,2],[6,5]], restricted = [4,2,1]
+Output: 3
+Explanation: The diagram above shows the tree.
+We have that [0,5,6] are the only nodes that can be reached from node 0 without visiting a restricted node.
+```
+
+ 
+
+**Constraints:**
+
+- `2 <= n <= 105`
+- `edges.length == n - 1`
+- `edges[i].length == 2`
+- `0 <= ai, bi < n`
+- `ai != bi`
+- `edges` represents a valid tree.
+- `1 <= restricted.length < n`
+- `1 <= restricted[i] < n`
+- All the values of `restricted` are **unique**.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number} n
+ * @param {number[][]} edges
+ * @param {number[]} restricted
+ * @return {number}
+ */
+var reachableNodes = function(n, edges, restricted) {
+    let graph = new Map();
+    
+    // make the graph without restricted
+    
+    let restrictSet = new Set(restricted);
+    
+    edges.forEach(([a, b]) => {
+        if(!graph.has(a)){
+            graph.set(a, []);
+        }
+
+        if(!graph.has(b)){
+            graph.set(b, []);
+        }
+
+        graph.get(a).push(b);
+        graph.get(b).push(a);
+    })
+    
+    // dfs
+    let seen = restrictSet;
+    let ans = 0;
+    
+    function dfs(node){
+        for(const neighbor of graph.get(node)){
+            if(!seen.has(neighbor)){
+                ans ++;
+                seen.add(neighbor)
+                dfs(neighbor);
+            }   
+        }
+    }
+    
+    seen.add(0);
+    ans++;
+    dfs(0);
+    
+    return ans;
+};
+```
+
