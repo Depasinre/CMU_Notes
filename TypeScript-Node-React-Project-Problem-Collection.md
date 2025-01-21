@@ -270,3 +270,37 @@ export default config;
 
 ```
 
+## 应用初始化时, 应用整体被挂载两次
+
+期初发现这个bug 的原因是因为我的页面组件的`useEffect` 钩子总是在页面加载后连续触发两次, 一开始我以为是React的组件生命周期问题, 在网络上查找后, 发现这一现象的普遍原因是因为React 18 后 `React.StricMode`带来的, 只在开发环境中出现. 但是经过我的测试, 我发现在我的应用中, 该现象也会在生产构建后的应用中出现. 
+
+我的下一步调试, 是在`App.tsx`中添加`useEffect` 钩子, 以及在`index.tsx`中添加调试代码, 来判断具体的双重挂载到底是发生在那一层中, 最后发现, 我的所有应用从最顶层都会执行两次, 这就和网络上大多数人遇到相同表现的问题本质不同了.
+
+最后, 我的问题出在我的index.html 模板中: 
+
+在`webpack.config` 中, 我添加了插件`HtmlWebpackPlugin`: 
+```js
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './public/index.html',
+        })
+    ],
+```
+
+其作用就是以我提供的`html`文件作为模板, 在打包的时候注入我的TypeScript脚本, 也就是说, 该插件会主动注入 `<script src="bundle.js"></script>`, 而我的`index.html`模板中, 我手动编写了`<script src="bundle.js"></script>`, 这就导致最后脚本会运行两遍
+
+解决方法: 
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>React App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- 不要手动加入 script 标签，HtmlWebpackPlugin 会自动注入 bundle.js -->
+  </body>
+</html>
+```
+
