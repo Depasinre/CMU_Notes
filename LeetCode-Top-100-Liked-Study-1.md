@@ -86,8 +86,6 @@ var letterCombinations = function(digits) {
 ```
 
 
-
-
 ## 2. Generate Parentheses
 
 Given `n` pairs of parentheses, write a function to *generate all combinations of well-formed parentheses*.
@@ -109,3 +107,37 @@ Output: ["()"]
 **Constraints:**
 
 - `1 <= n <= 8`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number} n
+ * @return {string[]}
+ */
+var generateParenthesis = function(n) {
+    let solution = []
+    if(n === 0) return [];
+
+    function BackTrace(left, right, comb){
+        if(left === 0 && right === 0){
+            solution.push(comb);
+            return;
+        }
+
+        if(left > 0){
+            BackTrace(left - 1, right, comb+'(');
+        }
+
+        if(right > left){
+            BackTrace(left, right - 1, comb+')');
+        }
+    }
+
+    BackTrace(n, n, "");
+
+    return solution;
+    
+};
+```
+
