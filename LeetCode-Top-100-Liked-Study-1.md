@@ -229,3 +229,197 @@ var combinationSum = function(candidates, target) {
 >   BackTracking(currentResult, sum + value, i);
 >   currentResult.pop(); // 回弹
 >   ```
+
+## 4. Kth Smallest Element in a BST
+
+Given the `root` of a binary search tree, and an integer `k`, return *the* `kth` *smallest value (**1-indexed**) of all the values of the nodes in the tree*.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/28/kthtree1.jpg)
+
+```
+Input: root = [3,1,4,null,2], k = 1
+Output: 1
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/28/kthtree2.jpg)
+
+```
+Input: root = [5,3,6,2,4,null,null,1], k = 3
+Output: 3
+```
+
+**Constraints:**
+
+- The number of nodes in the tree is `n`.
+- `1 <= k <= n <= 104`
+- `0 <= Node.val <= 104`
+
+**Follow up:** If the BST is modified often (i.e., we can do insert and delete operations) and you need to find the kth smallest frequently, how would you optimize?
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} k
+ * @return {number}
+ */
+var kthSmallest = function(root, k) {
+    let stack = [];
+
+    const traversal = (curr) => {
+        if(!curr) return;
+
+        traversal(curr.left);
+        stack.push(curr.val);
+        traversal(curr.right);
+    }
+
+    traversal(root);
+
+    return stack[k - 1];
+};
+```
+
+## 5. Symmetric Tree
+
+Given the `root` of a binary tree, *check whether it is a mirror of itself* (i.e., symmetric around its center).
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/symtree1.jpg)
+
+```
+Input: root = [1,2,2,3,4,4,3]
+Output: true
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/symtree2.jpg)
+
+```
+Input: root = [1,2,2,null,3,null,3]
+Output: false
+```
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[1, 1000]`.
+- `-100 <= Node.val <= 100`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function(root) {
+    const isMirror = (leftTree, rightTree) => {
+        if(!leftTree && !rightTree) return true;
+        if(!leftTree || !rightTree) return false;
+        if(leftTree.val !== rightTree.val) return false;
+
+        return isMirror(leftTree.left, rightTree.right) && isMirror(leftTree.right, rightTree.left)
+    }
+    
+    return isMirror(root.left, root.right);
+};
+```
+
+## 6. Binary Tree Level Order Traversal
+
+Given the `root` of a binary tree, return *the level order traversal of its nodes' values*. (i.e., from left to right, level by level).
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/tree1.jpg)
+
+```
+Input: root = [3,9,20,null,null,15,7]
+Output: [[3],[9,20],[15,7]]
+```
+
+**Example 2:**
+
+```
+Input: root = [1]
+Output: [[1]]
+```
+
+**Example 3:**
+
+```
+Input: root = []
+Output: []
+```
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 2000]`.
+- `-1000 <= Node.val <= 1000`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+var levelOrder = function(root) {
+    if(!root) return [];
+    let result = [];
+    let bfs = (root) => {
+        let nodes = [root];
+
+        while(nodes.length > 0){
+            let nextLevel = [];
+            let levelValue = [];
+
+            nodes.forEach((node) => {
+                levelValue.push(node.val);
+                if(node.left) nextLevel.push(node.left);
+                if(node.right) nextLevel.push(node.right);
+            })
+
+            nodes = nextLevel;
+            result.push(levelValue);
+        }
+    }
+
+    bfs(root);
+
+    return result;
+    
+};
+```
+
