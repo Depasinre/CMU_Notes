@@ -423,3 +423,100 @@ var levelOrder = function(root) {
 };
 ```
 
+## 7. Permutations
+
+Given an array `nums` of distinct integers, return all the possible permutations. You can return the answer in **any order**.
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+**Example 2:**
+
+```
+Input: nums = [0,1]
+Output: [[0,1],[1,0]]
+```
+
+**Example 3:**
+
+```
+Input: nums = [1]
+Output: [[1]]
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 6`
+- `-10 <= nums[i] <= 10`
+- All the integers of `nums` are **unique**.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var permute = function(nums) {
+    let solution = [];
+
+    const backTrack = (remain, path) => {
+        if(remain.length === 0){ 
+            solution.push(path);
+            return;
+        }
+
+        for(let i = 0; i < remain.length; i++){
+            let newRemain = remain.slice(); // 避免使用引用拷贝
+            let newPath = path.slice(); 
+            newPath.push(remain[i]);
+            newRemain.splice(i, 1);
+            backTrack(newRemain, newPath);
+        }
+    }
+
+    backTrack(nums, []);
+
+    return solution;
+    
+};
+```
+
+### Optimized Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var permute = function(nums) {
+    let solution = [];
+
+    const backTrack = (used, path) => {
+        if(path.length === nums.length){
+            solution.push([...path]); // 注意拷贝问题
+            return;
+        }
+
+        for(let i = 0; i < nums.length; i++){
+            if(used[i] === 1) continue;
+            used[i] = 1;
+            path.push(nums[i]);
+            backTrack(used, path);
+            used[i] = 0;
+            path.pop();
+        }
+
+    }
+
+    backTrack(new Array(nums.length).fill(0), []);
+
+    return solution;
+    
+};
+```
+
