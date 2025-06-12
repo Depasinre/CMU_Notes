@@ -520,3 +520,149 @@ var permute = function(nums) {
 };
 ```
 
+## 8. Search Insert Position
+
+Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+You must write an algorithm with `O(log n)` runtime complexity.
+
+**Example 1:**
+
+```
+Input: nums = [1,3,5,6], target = 5
+Output: 2
+```
+
+**Example 2:**
+
+```
+Input: nums = [1,3,5,6], target = 2
+Output: 1
+```
+
+**Example 3:**
+
+```
+Input: nums = [1,3,5,6], target = 7
+Output: 4
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 104`
+- `-104 <= nums[i] <= 104`
+- `nums` contains **distinct** values sorted in **ascending** order.
+- `-104 <= target <= 104`
+
+### My Solution
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var searchInsert = function(nums, target) {
+    let left = 0;
+    let right = nums.length - 1;
+
+
+    if(target > nums[right]){
+        return right + 1;
+    }
+
+    if(target < nums[left]){
+        return 0;
+    }
+
+    while (left <= right) {
+        let mid = Math.floor((left + right) / 2);
+
+        if (nums[mid] === target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return left;
+
+    
+};
+```
+
+## 9. Path Sum III
+
+Given the `root` of a binary tree and an integer `targetSum`, return *the number of paths where the sum of the values along the path equals* `targetSum`.
+
+The path does not need to start or end at the root or a leaf, but it must go downwards (i.e., traveling only from parent nodes to child nodes).
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/04/09/pathsum3-1-tree.jpg)
+
+```
+Input: root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8
+Output: 3
+Explanation: The paths that sum to 8 are shown.
+```
+
+**Example 2:**
+
+```
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+Output: 3
+```
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 1000]`.
+- `-109 <= Node.val <= 109`
+- `-1000 <= targetSum <= 1000`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @param {number} targetSum
+ * @return {number}
+ */
+var pathSum = function(root, targetSum) {
+    const prefixSumCount = new Map();
+    prefixSumCount.set(0, 1); // the empty path
+
+    const dfs = (root, currSum) => {
+        if(!root) return 0;
+        currSum += root.val;
+        let res = prefixSumCount.get(currSum - targetSum) || 0;
+
+        if(prefixSumCount.get(currSum)){
+            prefixSumCount.set(currSum, prefixSumCount.get(currSum) + 1);
+        } else {
+            prefixSumCount.set(currSum, 1);
+        }
+
+        res += dfs(root.left, currSum);
+        res += dfs(root.right, currSum);
+
+        prefixSumCount.set(currSum, prefixSumCount.get(currSum) - 1);
+
+        return res;
+
+    }
+
+    return dfs(root, 0);
+};
+```
+
