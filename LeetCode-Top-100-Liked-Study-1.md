@@ -772,7 +772,7 @@ Explanation: [1,null,3] and [3,1] are both height-balanced BSTs.
 
 ### My Solution
 
-```
+```javascript
 /**
  * Definition for a binary tree node.
  * function TreeNode(val, left, right) {
@@ -802,6 +802,99 @@ var sortedArrayToBST = function(nums) {
     }
 
     return build(0, nums.length - 1);
+    
+};
+```
+
+## 12. Course Schedule
+
+There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [ai, bi]` indicates that you **must** take course `bi` first if you want to take course `ai`.
+
+- For example, the pair `[0, 1]`, indicates that to take course `0` you have to first take course `1`.
+
+Return `true` if you can finish all courses. Otherwise, return `false`.
+
+**Example 1:**
+
+```
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0. So it is possible.
+```
+
+**Example 2:**
+
+```
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+```
+
+**Constraints:**
+
+- `1 <= numCourses <= 2000`
+- `0 <= prerequisites.length <= 5000`
+- `prerequisites[i].length == 2`
+- `0 <= ai, bi < numCourses`
+- All the pairs prerequisites[i] are **unique**.
+
+### My Solution
+
+```javascript
+/**
+ * @param {number} numCourses
+ * @param {number[][]} prerequisites
+ * @return {boolean}
+ */
+var canFinish = function(numCourses, prerequisites) {
+    // 转换为邻接表
+    const adjs = new Map();
+    prerequisites.forEach((edge) => {
+        let adj = adjs.get(edge[0]);
+        if(!adj) {
+            adjs.set(edge[0], [edge[1]]);
+        } else {
+            adj.push(edge[1]);
+        }
+    })
+
+    // 使用dfs 遍历邻接表
+    const visited = new Map();
+
+    const dfs = (node)=>{
+        if(visited.get(node) && visited.get(node) === 1){
+            return true;
+        } else {
+            // 正在进行检查
+            visited.set(node, 1);
+        }
+        let adjNodes = adjs.get(node);
+        for(let child of (adjNodes || [])){
+            // 如果一个节点已经确定了安全无环, 跳过不进行递归
+            if(visited.get(child) === 2) continue;
+
+            if(dfs(child)){
+                return true;
+            }
+        }
+        // 检查完毕, 安全无环
+        visited.set(node, 2);
+
+
+        return false;
+    }
+
+    let containCycle = false;
+    for(let key of adjs.keys()){
+        if(dfs(key)){
+            containCycle = true;
+            break;
+        }
+    }
+    
+    return !containCycle;
     
 };
 ```
