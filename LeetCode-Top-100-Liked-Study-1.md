@@ -669,7 +669,7 @@ var pathSum = function(root, targetSum) {
 
 
 
-## Construct Binary Tree from Preorder and Inorder Traversal
+## 10. Construct Binary Tree from Preorder and Inorder Traversal
 
 Given two integer arrays `preorder` and `inorder` where `preorder` is the preorder traversal of a binary tree and `inorder` is the inorder traversal of the same tree, construct and return *the binary tree*.
 
@@ -735,6 +735,74 @@ var buildTree = function(preorder, inorder) {
     const root = new TreeNode(rootVal, buildTree(preorderLeft,inorderLeft),  buildTree(preorderRight, inorderRight));
 
     return root;
+};
+```
+
+
+
+## 11. Convert Sorted Array to Binary Search Tree
+
+Given an integer array `nums` where the elements are sorted in **ascending order**, convert *it to a* **height-balanced** *binary search tree*.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/18/btree1.jpg)
+
+```
+Input: nums = [-10,-3,0,5,9]
+Output: [0,-3,9,-10,null,5]
+Explanation: [0,-10,5,null,-3,null,9] is also accepted:
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/18/btree.jpg)
+
+```
+Input: nums = [1,3]
+Output: [3,1]
+Explanation: [1,null,3] and [3,1] are both height-balanced BSTs.
+```
+
+**Constraints:**
+
+- `1 <= nums.length <= 104`
+- `-104 <= nums[i] <= 104`
+- `nums` is sorted in a **strictly increasing** order.
+
+### My Solution
+
+```
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {number[]} nums
+ * @return {TreeNode}
+ */
+var sortedArrayToBST = function(nums) {
+    const build = (left, right)=>{
+        if(left > right) return null;
+        const rootValIndex = Math.floor((left + right) / 2);
+        const newLeftInterval = [left, rootValIndex - 1]
+        const newRightInterval = [rootValIndex + 1, right];
+
+        const root = new TreeNode(
+            nums[rootValIndex],
+            build(newLeftInterval[0], newLeftInterval[1]),
+            build(newRightInterval[0], newRightInterval[1])
+            )
+
+        return root;
+    }
+
+    return build(0, nums.length - 1);
+    
 };
 ```
 
