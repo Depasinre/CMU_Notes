@@ -899,3 +899,111 @@ var canFinish = function(numCourses, prerequisites) {
 };
 ```
 
+## Word Search
+
+Given an `m x n` grid of characters `board` and a string `word`, return `true` *if* `word` *exists in the grid*.
+
+The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/04/word2.jpg)
+
+```
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+Output: true
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/04/word-1.jpg)
+
+```
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"
+Output: true
+```
+
+**Example 3:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/15/word3.jpg)
+
+```
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"
+Output: false
+```
+
+**Constraints:**
+
+- `m == board.length`
+- `n = board[i].length`
+- `1 <= m, n <= 6`
+- `1 <= word.length <= 15`
+- `board` and `word` consists of only lowercase and uppercase English letters.
+
+**Follow up:** Could you use search pruning to make your solution faster with a larger `board`?
+
+### My Solution
+
+```javascript
+/**
+ * @param {character[][]} board
+ * @param {string} word
+ * @return {boolean}
+ */
+
+const isValid = (x, y, visited, board) => {
+    return (
+        x >= 0 && 
+        x < board[0].length &&
+        y >= 0 && 
+        y < board.length &&
+        !visited[y][x]
+    );
+};
+
+var exist = function(board, word) {
+    let solution = false;
+    const findPath = (inputLetterIndex, visited, currentCheckingCoord) => {
+        if (solution) return; // 如果已经找到结果了可以跳过
+        const x =currentCheckingCoord[0];
+        const y = currentCheckingCoord[1];
+        visited[y][x] = true;
+        const currentLetter = board[y][x];
+        if (currentLetter !== word[inputLetterIndex]) {
+            visited[y][x] = false;  // 如果不符合可以提前回溯剪枝
+            return;
+        }
+        if(currentLetter === word[inputLetterIndex]){
+            if(inputLetterIndex === (word.length - 1)){
+                solution = true;
+                return;
+            }
+            const directions = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            for(let [dx, dy] of directions){
+                const newX = x + dx;
+                const newY = y + dy;
+                if(isValid(newX, newY, visited, board)){
+                    findPath(inputLetterIndex + 1, visited, [newX, newY]);
+                } 
+            }
+            visited[y][x] = false; // 回溯
+        }
+    }
+
+    for(let y = 0; y < board.length; y++){
+        for(let x = 0; x < board[0].length; x++){
+            if (board[y][x] === word[0]) { // 只对满足第一个字母的起点进行搜索
+                const visited = 
+                Array.from({ length: board.length }, () => new Array(board[0].length).fill(false));
+                findPath(0, visited, [x, y]);
+            }
+        }
+    }
+
+    return solution;
+    
+};
+
+
+```
+
