@@ -1151,3 +1151,112 @@ var invertTree = function(root) {
 };
 ```
 
+## 16. Flatten Binary Tree to Linked List
+
+Given the `root` of a binary tree, flatten the tree into a "linked list":
+
+- The "linked list" should use the same `TreeNode` class where the `right` child pointer points to the next node in the list and the `left` child pointer is always `null`.
+- The "linked list" should be in the same order as a [**pre-order** **traversal**](https://en.wikipedia.org/wiki/Tree_traversal#Pre-order,_NLR) of the binary tree.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/14/flaten.jpg)
+
+```
+Input: root = [1,2,5,3,4,null,6]
+Output: [1,null,2,null,3,null,4,null,5,null,6]
+```
+
+**Example 2:**
+
+```
+Input: root = []
+Output: []
+```
+
+**Example 3:**
+
+```
+Input: root = [0]
+Output: [0]
+```
+
+**Constraints:**
+
+- The number of nodes in the tree is in the range `[0, 2000]`.
+- `-100 <= Node.val <= 100`
+
+**Follow up:** Can you flatten the tree in-place (with `O(1)` extra space)?
+
+### My Solution
+
+```
+   1
+  / \
+ 2   5
+/ \   \
+3  4   6
+```
+
+- `node = 1`，有左子树 `2`
+  - 找到 `2` 的最右节点是 `4`
+  - 把 `5` 接到 `4.right`
+  - 把 `2` 挂到 `1.right`
+  - `1.left = null`
+
+此时：
+
+```
+1
+ \
+  2
+ / \
+3   4
+      \
+       5
+        \
+         6
+```
+
+- 接着 `node = 2`，重复一样操作...
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {void} Do not return anything, modify root in-place instead.
+ */
+var flatten = function(root) {
+
+    let node = root;
+    if(!node) return;
+    
+    while (node){
+        // 如果当前节点存在左子树, 则需要将其挪到右边
+        if(node.left){
+            
+            // 找到左子树中最靠右的节点
+            let rightMost = node.left;
+            while(rightMost.right){
+                rightMost = rightMost.right;
+            }
+            
+            // 将根的右子树挪到该最右点的右子树, 然后将整个左子树挪到右子树上
+            rightMost.right = node.right;
+            node.right = node.left;
+            node.left = null;
+        }
+        // 一直向右检查, 直到尽头, 在这个过程中, 所有左子树都被挪到了右边
+        node = node.right;
+    }
+    
+};
+```
+
