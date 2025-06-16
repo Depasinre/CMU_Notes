@@ -1264,3 +1264,231 @@ var flatten = function(root) {
 };
 ```
 
+## 17. Intersection of Two Linked Lists
+
+Given the heads of two singly linked-lists `headA` and `headB`, return *the node at which the two lists intersect*. If the two linked lists have no intersection at all, return `null`.
+
+For example, the following two linked lists begin to intersect at node `c1`:
+
+![img](https://assets.leetcode.com/uploads/2021/03/05/160_statement.png)
+
+The test cases are generated such that there are no cycles anywhere in the entire linked structure.
+
+**Note** that the linked lists must **retain their original structure** after the function returns.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/05/160_example_1_1.png)
+
+```
+Input: listA = [4,1,8,4,5], listB = [5,6,1,8,4,5]
+Output: Intersected at '8'
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/05/160_example_2.png)
+
+```
+Input: listA = [1,9,1,2,4], listB = [3,2,4]
+Output: Intersected at '2'
+```
+
+**Example 3:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/05/160_example_3.png)
+
+```
+Input: listA = [2,6,4], listB = [1,5]
+Output: null
+```
+
+**Constraints:**
+
+- The number of nodes of `listA` is in the `m`.
+- The number of nodes of `listB` is in the `n`.
+- `1 <= m, n <= 3 * 104`
+- `1 <= Node.val <= 105`
+
+**Follow up:** Could you write a solution that runs in `O(m + n)` time and use only `O(1)` memory?
+
+### My Solution
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    if (!headA || !headB) return null;
+    
+    let pointerA = headA;
+    let pointerB = headB;
+
+    while (pointerA != pointerB){
+        pointerA = pointerA? pointerA.next : headB;
+        pointerB = pointerB? pointerB.next : headA;
+    }
+
+    return pointerA;
+};
+```
+
+## 18. Reverse Linked List
+
+Given the `head` of a singly linked list, reverse the list, and return *the reversed list*.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/rev1ex1.jpg)
+
+```
+Input: head = [1,2,3,4,5]
+Output: [5,4,3,2,1]
+```
+
+**Example 2:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/rev1ex2.jpg)
+
+```
+Input: head = [1,2]
+Output: [2,1]
+```
+
+**Example 3:**
+
+```
+Input: head = []
+Output: []
+```
+
+**Constraints:**
+
+- The number of nodes in the list is the range `[0, 5000]`.
+- `-5000 <= Node.val <= 5000`
+
+### My Solution
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function(head) {
+    if(!head) return head;
+    if(!head.next) return head;
+
+    let front = head.next;
+    let back = head;
+
+    head.next = null;
+
+    while (front){
+        let next = front.next;
+        front.next = back;
+        back = front;
+        front = next;
+    }
+
+    return back;
+
+};
+```
+
+## 19. Add Two Numbers
+
+You are given two **non-empty** linked lists representing two non-negative integers. The digits are stored in **reverse order**, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/02/addtwonumber1.jpg)
+
+```
+Input: l1 = [2,4,3], l2 = [5,6,4]
+Output: [7,0,8]
+Explanation: 342 + 465 = 807.
+```
+
+**Example 2:**
+
+```
+Input: l1 = [0], l2 = [0]
+Output: [0]
+```
+
+**Example 3:**
+
+```
+Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
+Output: [8,9,9,9,0,0,0,1]
+```
+
+**Constraints:**
+
+- The number of nodes in each linked list is in the range `[1, 100]`.
+- `0 <= Node.val <= 9`
+- It is guaranteed that the list represents a number that does not have leading zeros.
+
+### My Solution
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+var addTwoNumbers = function(l1, l2) {
+
+    let carry = 0;
+
+    let p1 = l1;
+    let p2 = l2;
+    let head = new ListNode();
+    let lastResult = head;
+
+    while ( p1 || p2 || (carry != 0)){
+        let p1Digit = p1 ? p1.val : 0;
+        let p2Digit = p2 ? p2.val : 0;
+        let digitSum = p1Digit + p2Digit + carry;
+        let digit = digitSum % 10;
+        carry = Math.floor(digitSum / 10);
+
+        let newNode = new ListNode(digit);
+        lastResult.next = newNode;
+
+        p1 = p1? p1.next : null;
+        p2 = p2? p2.next : null;
+        lastResult = newNode;
+    }
+
+    return head.next;
+    
+};
+```
+
